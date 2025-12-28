@@ -136,16 +136,17 @@ class BattlegroundScreen private constructor(
         protected abstract fun getSortKey(votes: Map<PartyOrCandidate, Int>): Double?
     }
 
-    private class DefenseBattlegroundInput<T> : BattlegroundInput<T, Party>() {
+    private class DefenseBattlegroundInput<T> : BattlegroundInput<T, PartyOrCoalition>() {
         override fun getSortKey(votes: Map<PartyOrCandidate, Int>): Double? {
             val prevWinner = votes.entries.maxBy { it.value }.key
-            if (prevWinner.let { partyChanges[it.party] ?: it.party } != party) {
+            val constituentParties = party?.constituentParties ?: emptyList()
+            if (!constituentParties.contains(prevWinner.let { partyChanges[it.party] ?: it.party })) {
                 return null
             }
             val adjustedVotes = Aggregators.adjustKey(votes) { partyChanges[it.party]?.let { p -> PartyOrCandidate(p) } ?: it }
-            val partyPrevVotes = adjustedVotes.entries.first { it.key.party == party }.value
+            val partyPrevVotes = adjustedVotes.entries.first { constituentParties.contains(it.key.party) }.value
             val prevRunnerUpVotes = adjustedVotes
-                .filter { it.key.party != party }
+                .filter { !constituentParties.contains(it.key.party) }
                 .maxOfOrNull { it.value }
                 ?: 0
             val total = votes.values.sum()
@@ -153,15 +154,16 @@ class BattlegroundScreen private constructor(
         }
     }
 
-    private class TargetBattlegroundInput<T> : BattlegroundInput<T, Party>() {
+    private class TargetBattlegroundInput<T> : BattlegroundInput<T, PartyOrCoalition>() {
         override fun getSortKey(votes: Map<PartyOrCandidate, Int>): Double? {
             val prevWinner = votes.entries.maxBy { it.value }.key
-            if (prevWinner.let { partyChanges[it.party] ?: it.party } == party) {
+            val constituentParties = party?.constituentParties ?: emptyList()
+            if (constituentParties.contains(prevWinner.let { partyChanges[it.party] ?: it.party })) {
                 return null
             }
             val adjustedVotes = Aggregators.adjustKey(votes) { partyChanges[it.party]?.let { p -> PartyOrCandidate(p) } ?: it }
-            val partyPrevVotes = adjustedVotes.entries.firstOrNull { it.key.party == party }?.value ?: 0
-            val prevWinnerVotes = adjustedVotes.entries.filter { it.key.party != party }.maxOf { it.value }
+            val partyPrevVotes = adjustedVotes.entries.firstOrNull { constituentParties.contains(it.key.party) }?.value ?: 0
+            val prevWinnerVotes = adjustedVotes.entries.filter { !constituentParties.contains(it.key.party) }.maxOf { it.value }
             val total = votes.values.sum()
             return (prevWinnerVotes - partyPrevVotes) / total.toDouble()
         }
@@ -280,7 +282,7 @@ class BattlegroundScreen private constructor(
             prevResults: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
             currResults: Flow.Publisher<out Map<T, PartyResult?>>,
             name: T.() -> Flow.Publisher<String>,
-            party: Flow.Publisher<out Party>,
+            party: Flow.Publisher<out PartyOrCoalition>,
             seatsToShow: (SingleSeatsToShow.() -> Unit)? = null,
             numRows: Flow.Publisher<out Int>? = null,
             seatFilter: Flow.Publisher<out Set<T>?>? = null,
@@ -299,7 +301,7 @@ class BattlegroundScreen private constructor(
             val defenseItems = defenseInput.items
             val defenseFrame = ResultListingFrame(
                 headerPublisher = party.map { "$it DEFENSE SEATS" },
-                borderColorPublisher = party.map(Party::color),
+                borderColorPublisher = party.map(PartyOrCoalition::color),
                 headerAlignmentPublisher = GraphicsFrame.Alignment.RIGHT.asOneTimePublisher(),
                 numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
                 itemsPublisher = defenseItems.compose { items ->
@@ -327,7 +329,7 @@ class BattlegroundScreen private constructor(
             val targetItems = targetInput.items
             val targetFrame = ResultListingFrame(
                 headerPublisher = party.map { "$it TARGET SEATS" },
-                borderColorPublisher = party.map(Party::color),
+                borderColorPublisher = party.map(PartyOrCoalition::color),
                 headerAlignmentPublisher = GraphicsFrame.Alignment.LEFT.asOneTimePublisher(),
                 numRowsPublisher = numRows ?: DEFAULT_ROWS.asOneTimePublisher(),
                 itemsPublisher = targetItems.compose { items ->
@@ -355,7 +357,7 @@ class BattlegroundScreen private constructor(
                 }
                     .merge(currResults) { (rows, party), result -> Triple(rows, party, result.all { r -> r.value?.elected ?: true }) }
 
-                val textGenerator: (List<Entry<T>>, Int, Party, Boolean, String, String) -> String? = { items, rows, party, allDone, winLabel, loseLabel ->
+                val textGenerator: (List<Entry<T>>, Int, PartyOrCoalition, Boolean, String, String) -> String? = { items, rows, party, allDone, winLabel, loseLabel ->
                     if (items.none { it.isIncluded }) {
                         null
                     } else {
@@ -366,7 +368,7 @@ class BattlegroundScreen private constructor(
                             val categories = entries.groupBy {
                                 when {
                                     it.currResult == null -> "PENDING"
-                                    it.currResult.leader == party -> winLabel
+                                    party.constituentParties.contains(it.currResult.leader) -> winLabel
                                     else -> loseLabel
                                 }
                             }.toSortedMap()

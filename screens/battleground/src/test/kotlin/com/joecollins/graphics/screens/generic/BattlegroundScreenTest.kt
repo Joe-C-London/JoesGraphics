@@ -6,6 +6,7 @@ import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.models.general.Coalition
 import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
+import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.models.general.PartyResult
 import com.joecollins.models.general.PartyResult.Companion.elected
 import com.joecollins.models.general.PartyResult.Companion.leading
@@ -122,6 +123,131 @@ class BattlegroundScreenTest {
             NDP TARGET SEATS
             COLUMN 1: 4(9) GAINS, 2(6) MISSES
             COLUMN 2: 0(5) GAINS, 2(10) MISSES
+            """.trimIndent(),
+        )
+
+        party.submit(lib)
+        targetSeats.submit(0)
+        defenseSeats.submit(30)
+        title.submit("LIBERAL DEFENSE")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-6", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            LIBERAL DEFENSE
+
+            LIB DEFENSE SEATS
+            COLUMN 1: 1(6) HOLDS, 4(9) LOSSES
+            COLUMN 2: 3(9) HOLDS, 0(6) LOSSES
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testSingleCoalitionBattleground() {
+        val prevResult = Publisher(bcPrevResult())
+        val currResult = Publisher<Map<String, PartyResult>>(emptyMap())
+        val coalition = Coalition("NDP/GREEN COALITION", "NDP/GRN", ndp, grn)
+        val party = Publisher(coalition as PartyOrCoalition)
+        val targetSeats = Publisher(30)
+        val defenseSeats = Publisher(15)
+        val numRows = Publisher(15)
+        val title = Publisher("NDP/GREEN BATTLEGROUND")
+        val panel = BattlegroundScreen.singleParty(
+            prevResults = prevResult.convertToPartyOrCandidateForBattleground(),
+            currResults = currResult,
+            name = { uppercase().asOneTimePublisher() },
+            party = party,
+            seatsToShow = {
+                defense = defenseSeats
+                target = targetSeats
+            },
+            numRows = numRows,
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("BattlegroundScreen", "Basic-SingleCoalition-1", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            NDP/GREEN BATTLEGROUND
+
+            NDP/GRN TARGET SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            
+            NDP/GRN DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            """.trimIndent(),
+        )
+
+        party.submit(lib)
+        targetSeats.submit(15)
+        defenseSeats.submit(30)
+        title.submit("LIBERAL BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-2", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            LIBERAL BATTLEGROUND
+
+            LIB TARGET SEATS
+            COLUMN 1: 15 PENDING
+
+            LIB DEFENSE SEATS
+            COLUMN 1: 15 PENDING
+            COLUMN 2: 15 PENDING
+            """.trimIndent(),
+        )
+
+        currResult.submit(bcCurrResult())
+        compareRendering("BattlegroundScreen", "Basic-SingleParty-3", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            LIBERAL BATTLEGROUND
+
+            LIB TARGET SEATS
+            COLUMN 1: 14(15) MISSES
+
+            LIB DEFENSE SEATS
+            COLUMN 1: 1(6) HOLDS, 4(9) LOSSES
+            COLUMN 2: 3(9) HOLDS, 0(6) LOSSES
+            """.trimIndent(),
+        )
+
+        party.submit(coalition)
+        targetSeats.submit(30)
+        defenseSeats.submit(5)
+        title.submit("NDP/GREEN BATTLEGROUND")
+        compareRendering("BattlegroundScreen", "Basic-SingleCoalition-4", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            NDP/GREEN BATTLEGROUND
+
+            NDP/GRN TARGET SEATS
+            COLUMN 1: 4(10) GAINS, 1(5) MISSES
+            COLUMN 2: 0(5) GAINS, 3(10) MISSES
+            
+            NDP/GRN DEFENSE SEATS
+            COLUMN 1: 4(5) HOLDS
+            """.trimIndent(),
+        )
+
+        party.submit(coalition)
+        targetSeats.submit(30)
+        defenseSeats.submit(0)
+        title.submit("NDP/GREEN TARGETS")
+        compareRendering("BattlegroundScreen", "Basic-SingleCoalition-5", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            NDP/GREEN TARGETS
+
+            NDP/GRN TARGET SEATS
+            COLUMN 1: 4(10) GAINS, 1(5) MISSES
+            COLUMN 2: 0(5) GAINS, 3(10) MISSES
             """.trimIndent(),
         )
 
