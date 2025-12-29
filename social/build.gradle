@@ -17,7 +17,7 @@ repositories {
 dependencies {
     api group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.7' // WARNING: Breaking changes in 4.1.2
     api group: 'com.twitter', name: 'twitter-api-java-sdk', version: '2.0.3'
-    api group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
+    api group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"

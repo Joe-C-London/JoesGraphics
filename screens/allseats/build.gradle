@@ -19,7 +19,7 @@ dependencies {
     implementation topLevel.project('pubsub')
     implementation topLevel.project('components:resultlistingframe')
 
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.19.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
 
     testImplementation topLevel.project('testutils')
 
