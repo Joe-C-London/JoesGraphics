@@ -16,19 +16,19 @@ abstract class GenericReader {
         if (keyType == Int::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
-                Integer::class.cast(feature[keyProperty]).toInt() as T
+                Int::class.cast(feature[keyProperty]) as T
             }
         }
         if (keyType == Long::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
-                Long::class.cast(feature[keyProperty]).toLong() as T
+                Long::class.cast(feature[keyProperty]) as T
             }
         }
         if (keyType == Double::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
-                Double::class.cast(feature[keyProperty]).toDouble() as T
+                Double::class.cast(feature[keyProperty]) as T
             }
         }
         return readShapes(file) { feature -> keyType.cast(feature[keyProperty]) }

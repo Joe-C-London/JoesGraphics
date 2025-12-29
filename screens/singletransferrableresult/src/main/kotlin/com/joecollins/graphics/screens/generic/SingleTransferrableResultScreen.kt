@@ -242,7 +242,7 @@ class SingleTransferrableResultScreen private constructor(
                                 "WAITING..."
                             } else {
                                 "${if (v is Int) {
-                                    DecimalFormat("#,##0").format(v.toInt())
+                                    DecimalFormat("#,##0").format(v)
                                 } else {
                                     DecimalFormat("#,##0.00").format(v.toDouble())
                                 }}${if (q == null) {
@@ -261,7 +261,7 @@ class SingleTransferrableResultScreen private constructor(
                             ""
                         }}"
                     }
-                val quota = (q?.let { "QUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it.toInt()) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
+                val quota = (q?.let { "QUOTA: ${if (it is Int) DecimalFormat("#,##0").format(it) else DecimalFormat("#,##0.00").format(it.toDouble())}" } ?: "")
                 val prevExcluded = ex.reversed().filter { !votes.containsKey(it.first) }.filter { candidateResults.showExcludedCandidates(it.first) }
                     .joinToString("\n") { (c, r) -> "${candidateFunc(c)}: $r" }
                 listOf(prevElected, currRound, prevExcluded, quota)

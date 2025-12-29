@@ -38,7 +38,7 @@ class Subscriber<T>(
     companion object {
         fun <T> eventQueueWrapper(func: (T) -> Unit): (T) -> Unit {
             data class Wrapper(val item: T)
-            val lock = Object()
+            val lock = Any()
             var wrapper: Wrapper? = null
             return { item ->
                 synchronized(lock) {
