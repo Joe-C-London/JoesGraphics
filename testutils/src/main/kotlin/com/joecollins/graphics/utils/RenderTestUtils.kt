@@ -25,8 +25,8 @@ object RenderTestUtils {
             compareImage(expectedFile, actualFile) < 0.001
         }
         if (!isMatch) {
-            println(expectedFile.absolutePath)
-            println(actualFile.absolutePath)
+            println((if (System.getProperty("os.name").startsWith("Windows")) "" else "open ") + expectedFile.absolutePath)
+            println((if (System.getProperty("os.name").startsWith("Windows")) "" else "open ") + actualFile.absolutePath)
             println(
                 String.format(
                     if (System.getProperty("os.name").startsWith("Windows")) "copy /Y %s %s" else "cp %s %s",
