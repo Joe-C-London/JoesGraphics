@@ -1353,4 +1353,120 @@ class SimplePartyVoteViewPanelTest {
             """.trimIndent(),
         )
     }
+
+    @Test
+    fun testPartyVoteScreenWithVotes() {
+        val ndp = Party("New Democratic Party", "NDP", Color.ORANGE)
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val currentVotes = Publisher(emptyMap<Party, Int>())
+        val previousVotes = Publisher(emptyMap<Party, Int>())
+        val pctReporting = Publisher(0.0)
+        val title = Publisher("PRINCE EDWARD ISLAND")
+        val voteHeader = Publisher("0 OF 27 DISTRICTS DECLARED")
+        val voteSubhead = Publisher("WAITING FOR RESULTS...")
+        val changeHeader = Publisher("CHANGE SINCE 2015")
+        val swingHeader = Publisher("SWING SINCE 2015")
+        val mapHeader = Publisher("PEI")
+        val swingPartyOrder = listOf(ndp, grn, lib, pc)
+        val shapesByDistrict = peiShapesByDistrict()
+        val focus = Publisher<List<Int>?>(null)
+        val winnersByDistrict = Publisher<Map<Int, Party?>>(HashMap())
+        val panel = partyVotes(
+            current = {
+                votes = currentVotes
+                header = voteHeader
+                subhead = voteSubhead
+                display = SimpleVoteViewPanel.Display.VOTES_AND_PCT
+                this.pctReporting = pctReporting
+            },
+            prev = {
+                votes = previousVotes
+                header = changeHeader
+                swing = {
+                    partyOrder = swingPartyOrder
+                    header = swingHeader
+                }
+            },
+            map = createPartyMap {
+                shapes = shapesByDistrict.asOneTimePublisher()
+                winners = winnersByDistrict
+                this.focus = focus
+                header = mapHeader
+            },
+            title = title,
+        )
+        panel.setSize(1024, 512)
+        compareRendering("SimpleVoteViewPanel", "PopularVote-1", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+                
+                0 OF 27 DISTRICTS DECLARED, WAITING FOR RESULTS... (CHANGE SINCE 2015)
+                
+                SWING SINCE 2015: NOT AVAILABLE
+            """.trimIndent(),
+        )
+
+        val winners = mutableMapOf<Int, Party?>()
+        currentVotes.submit(
+            mapOf(
+                ndp to 124,
+                pc to 1373,
+                lib to 785,
+                grn to 675,
+            ),
+        )
+        previousVotes.submit(
+            mapOf(
+                ndp to 585,
+                pc to 785,
+                lib to 1060,
+                grn to 106,
+            ),
+        )
+        voteHeader.submit("1 OF 27 DISTRICTS DECLARED")
+        voteSubhead.submit("PROJECTION: TOO EARLY TO CALL")
+        pctReporting.submit(1.0 / 27)
+        winners[3] = pc
+        winnersByDistrict.submit(winners)
+        compareRendering("SimpleVoteViewPanel", "PopularVoteWithVotes-2", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+                
+                1 OF 27 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                PROGRESSIVE CONSERVATIVE: 1,373 (46.4%, +15.5%)
+                LIBERAL: 785 (26.5%, -15.3%)
+                GREEN: 675 (22.8%, +18.6%)
+                NEW DEMOCRATIC PARTY: 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
+            """.trimIndent(),
+        )
+
+        focus.submit(shapesByDistrict.keys.filter { it <= 7 })
+        mapHeader.submit("CARDIGAN")
+        title.submit("CARDIGAN")
+        pctReporting.submit(1.0 / 7)
+        voteHeader.submit("1 OF 7 DISTRICTS DECLARED")
+        compareRendering("SimpleVoteViewPanel", "PopularVoteWithVotes-3", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+                CARDIGAN
+                
+                1 OF 7 DISTRICTS DECLARED, PROJECTION: TOO EARLY TO CALL (CHANGE SINCE 2015)
+                PROGRESSIVE CONSERVATIVE: 1,373 (46.4%, +15.5%)
+                LIBERAL: 785 (26.5%, -15.3%)
+                GREEN: 675 (22.8%, +18.6%)
+                NEW DEMOCRATIC PARTY: 124 (4.2%, -18.9%)
+                
+                SWING SINCE 2015: 15.4% SWING LIB TO PC
+            """.trimIndent(),
+        )
+    }
 }

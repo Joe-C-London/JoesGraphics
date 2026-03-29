@@ -73,32 +73,35 @@ class SimpleVoteViewPanel private constructor(
             partyClassification: (PartyClassification<PartyOrCoalition>.() -> Unit)? = null,
             map: AbstractMap<*>? = null,
             title: Flow.Publisher<out String?>,
-        ): SimpleVoteViewPanel = VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
-            current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
-            prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-            winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
-            displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
-            partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
-            preferences = null,
-            map = map?.mapFrame,
-            secondMap = null,
-            keyTemplate = BasicResultPanel.PartyTemplate(),
-            voteTemplate = VotePctOnlyTemplate,
-            valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
-            others = Party.OTHERS,
-            title = title,
-            createBarFrame = {
-                BarFrameBuilder.basic(
-                    barsPublisher = bars,
-                    headerPublisher = header,
-                    rightHeaderLabelPublisher = progress,
-                    subheadPublisher = subhead,
-                    notesPublisher = notes,
-                    limitsPublisher = limits,
-                    linesPublisher = lines,
-                )
-            },
-        ).build()
+        ): SimpleVoteViewPanel {
+            val currentVotes = CurrentVotes<PartyOrCoalition, Int?>().apply(current)
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = currentVotes,
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+                preferences = null,
+                map = map?.mapFrame,
+                secondMap = null,
+                keyTemplate = BasicResultPanel.PartyTemplate(),
+                voteTemplate = currentVotes.display.template,
+                valueTemplate = VoteValueTemplate(currentVotes.display.template),
+                others = Party.OTHERS,
+                title = title,
+                createBarFrame = {
+                    BarFrameBuilder.basic(
+                        barsPublisher = bars,
+                        headerPublisher = header,
+                        rightHeaderLabelPublisher = progress,
+                        subheadPublisher = subhead,
+                        notesPublisher = notes,
+                        limitsPublisher = limits,
+                        linesPublisher = lines,
+                    )
+                },
+            ).build()
+        }
 
         fun partyVotes(
             current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
@@ -109,32 +112,35 @@ class SimpleVoteViewPanel private constructor(
             map: AbstractMap<*>,
             secondMap: AbstractMap<*>,
             title: Flow.Publisher<out String?>,
-        ): SimpleVoteViewPanel = VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
-            current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
-            prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-            winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
-            displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
-            partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
-            preferences = null,
-            map = map.mapFrame,
-            secondMap = secondMap.mapFrame,
-            keyTemplate = BasicResultPanel.PartyTemplate(),
-            voteTemplate = VotePctOnlyTemplate,
-            valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
-            others = Party.OTHERS,
-            title = title,
-            createBarFrame = {
-                BarFrameBuilder.basic(
-                    barsPublisher = bars,
-                    headerPublisher = header,
-                    rightHeaderLabelPublisher = progress,
-                    subheadPublisher = subhead,
-                    notesPublisher = notes,
-                    limitsPublisher = limits,
-                    linesPublisher = lines,
-                )
-            },
-        ).build()
+        ): SimpleVoteViewPanel {
+            val currentVotes = CurrentVotes<PartyOrCoalition, Int?>().apply(current)
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = currentVotes,
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
+                partyClassification = partyClassification?.let { PartyClassification<PartyOrCoalition>().apply(it) },
+                preferences = null,
+                map = map.mapFrame,
+                secondMap = secondMap.mapFrame,
+                keyTemplate = BasicResultPanel.PartyTemplate(),
+                voteTemplate = currentVotes.display.template,
+                valueTemplate = VoteValueTemplate(currentVotes.display.template),
+                others = Party.OTHERS,
+                title = title,
+                createBarFrame = {
+                    BarFrameBuilder.basic(
+                        barsPublisher = bars,
+                        headerPublisher = header,
+                        rightHeaderLabelPublisher = progress,
+                        subheadPublisher = subhead,
+                        notesPublisher = notes,
+                        limitsPublisher = limits,
+                        linesPublisher = lines,
+                    )
+                },
+            ).build()
+        }
 
         fun partyVotes(
             current: CurrentVotes<PartyOrCoalition, Int?>.() -> Unit,
@@ -144,32 +150,35 @@ class SimpleVoteViewPanel private constructor(
             map: AbstractMap<*>? = null,
             preferences: (Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>.() -> Unit),
             title: Flow.Publisher<out String?>,
-        ): SimpleVoteViewPanel = VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
-            current = CurrentVotes<PartyOrCoalition, Int?>().apply(current),
-            prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
-            winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
-            displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
-            partyClassification = null,
-            preferences = Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>().apply(preferences),
-            map = map?.mapFrame,
-            secondMap = null,
-            keyTemplate = BasicResultPanel.PartyTemplate(),
-            voteTemplate = VotePctOnlyTemplate,
-            valueTemplate = VoteValueTemplate(VotePctOnlyTemplate),
-            others = Party.OTHERS,
-            title = title,
-            createBarFrame = {
-                BarFrameBuilder.basic(
-                    barsPublisher = bars,
-                    headerPublisher = header,
-                    rightHeaderLabelPublisher = progress,
-                    subheadPublisher = subhead,
-                    notesPublisher = notes,
-                    limitsPublisher = limits,
-                    linesPublisher = lines,
-                )
-            },
-        ).build()
+        ): SimpleVoteViewPanel {
+            val currentVotes = CurrentVotes<PartyOrCoalition, Int?>().apply(current)
+            return VoteScreenBuilder<PartyOrCoalition, PartyOrCoalition, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = currentVotes,
+                prev = prev?.let { PrevVotes<PartyOrCoalition>().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<PartyOrCoalition>().apply(it) },
+                partyClassification = null,
+                preferences = Preferences<PartyOrCoalition, PartyOrCoalition, Int?, Int>().apply(preferences),
+                map = map?.mapFrame,
+                secondMap = null,
+                keyTemplate = BasicResultPanel.PartyTemplate(),
+                voteTemplate = currentVotes.display.template,
+                valueTemplate = VoteValueTemplate(currentVotes.display.template),
+                others = Party.OTHERS,
+                title = title,
+                createBarFrame = {
+                    BarFrameBuilder.basic(
+                        barsPublisher = bars,
+                        headerPublisher = header,
+                        rightHeaderLabelPublisher = progress,
+                        subheadPublisher = subhead,
+                        notesPublisher = notes,
+                        limitsPublisher = limits,
+                        linesPublisher = lines,
+                    )
+                },
+            ).build()
+        }
 
         fun partyPct(
             current: CurrentVotes<PartyOrCoalition, Double>.() -> Unit,
@@ -998,7 +1007,9 @@ class SimpleVoteViewPanel private constructor(
         }
     }
 
-    class CurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>()
+    class CurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>() {
+        var display: Display = Display.PCT_ONLY
+    }
 
     class CandidateCurrentVotes<KT : Any, CT> internal constructor() : AbstractCurrentVotes<KT, CT>() {
         var incumbentMarkerByType: ((IncumbencyType) -> String)? = null
