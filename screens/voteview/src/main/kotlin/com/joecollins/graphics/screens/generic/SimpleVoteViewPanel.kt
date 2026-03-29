@@ -567,9 +567,13 @@ class SimpleVoteViewPanel private constructor(
             value = ((value ?: 0).toDouble() / (forcedTotal ?: 0)).takeUnless { it.isNaN() } ?: 0.0,
             valueLabel = when {
                 numBars == 1 -> listOf(singleBarLabel)
+
                 value == null -> listOf("WAITING...")
+
                 forcedTotal == 0 -> listOf("WAITING...")
+
                 total == null || total == 0 -> listOf(DecimalFormat("#,##0").format(value))
+
                 else -> voteTemplate.toBarString(
                     votes = value,
                     pct = value.toDouble() / total,
@@ -602,10 +606,15 @@ class SimpleVoteViewPanel private constructor(
             result: String?,
         ): String = "$keyLabel: " + when {
             numBars == 1 -> "UNCONTESTED"
+
             value == null && diff != null -> "- (" + DecimalFormat("0.0%").format(diff) + ")"
+
             value == null -> "WAITING..."
+
             value == 0 && total == 0 -> "WAITING..."
+
             total == null || total == 0 -> DecimalFormat("#,##0").format(value)
+
             else -> voteTemplate.toAltTextString(
                 votes = value,
                 pct = value.toDouble() / total,
@@ -624,10 +633,15 @@ class SimpleVoteViewPanel private constructor(
             result: String?,
         ): String = "$keyLabel: " + when {
             numBars == 1 -> "ELECTED"
+
             value == null && diff != null -> "- (" + DecimalFormat("0.0%").format(diff) + ")"
+
             value == null -> "WAITING..."
+
             value == 0 && total == 0 -> "WAITING..."
+
             total == null || total == 0 -> DecimalFormat("#,##0").format(value)
+
             else -> voteTemplate.toAltTextString(
                 votes = value,
                 pct = value.toDouble() / total,
@@ -860,6 +874,7 @@ class SimpleVoteViewPanel private constructor(
             value = value.takeUnless { it.isNaN() } ?: 0.0,
             valueLabel = when {
                 numBars == 1 -> listOf(singleBarLabel)
+
                 else -> VotePctOnlyTemplate.toBarString(
                     votes = 0,
                     pct = value,
@@ -892,8 +907,11 @@ class SimpleVoteViewPanel private constructor(
             result: String?,
         ): String = "$keyLabel: " + when {
             numBars == 1 -> "UNCONTESTED"
+
             value == null && diff != null -> "- (" + DecimalFormat("0.0%").format(diff) + ")"
+
             value == null -> "WAITING..."
+
             else -> VotePctOnlyTemplate.toAltTextString(
                 votes = 0,
                 pct = value,
@@ -912,8 +930,11 @@ class SimpleVoteViewPanel private constructor(
             result: String?,
         ): String = "$keyLabel: " + when {
             numBars == 1 -> "ELECTED"
+
             value == null && diff != null -> "- (" + DecimalFormat("0.0%").format(diff) + ")"
+
             value == null -> "WAITING..."
+
             else -> VotePctOnlyTemplate.toAltTextString(
                 votes = 0,
                 pct = value,
@@ -1578,6 +1599,7 @@ class SimpleVoteViewPanel private constructor(
                         BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6))
                     }
                 }
+
                 prev.showRaw != null -> prev.showRaw!!.map { showRaw ->
                     if (showRaw) {
                         BarFrameBuilder.Limit(max = 2.0 / 3)
@@ -1585,7 +1607,9 @@ class SimpleVoteViewPanel private constructor(
                         BarFrameBuilder.Limit(wingspan = 0.1)
                     }
                 }
+
                 current.pctReporting != null -> current.pctReporting!!.map { pct -> BarFrameBuilder.Limit(wingspan = 0.1 / pct.coerceAtLeast(1e-6)) }
+
                 else -> BarFrameBuilder.Limit(wingspan = 0.1).asOneTimePublisher()
             }
             return createDiffFrameBuilder(
@@ -1780,10 +1804,12 @@ class SimpleVoteViewPanel private constructor(
                                     partyDiffsAggregated = true
                                     "^"
                                 }
+
                                 entry.key != null && entry.diff == null && !raw && entries.any { it.party == Party.OTHERS && it.diff != null } -> {
                                     partyDiffWithOthers = true
                                     "*"
                                 }
+
                                 else -> null
                             },
                             when (entry.result) {

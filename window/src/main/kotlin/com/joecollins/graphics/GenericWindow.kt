@@ -114,11 +114,13 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                     DataFlavor.allHtmlFlavor -> {
                         html
                     }
+
                     DataFlavor.stringFlavor -> {
                         html.replace("<html>", "")
                             .replace("</html>", "")
                             .replace("<br/>", "\n")
                     }
+
                     else -> {
                         throw UnsupportedFlavorException(flavor)
                     }

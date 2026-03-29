@@ -148,6 +148,7 @@ class MultiResultScreen private constructor(
                         candidate === others -> {
                             listOf("OTHERS")
                         }
+
                         else -> {
                             listOfNotNull(
                                 name(candidate).uppercase(),
@@ -159,9 +160,11 @@ class MultiResultScreen private constructor(
                         pct.isNaN() -> {
                             listOf("WAITING...")
                         }
+
                         pctOnly -> {
                             listOf(DecimalFormat("0.0%").format(pct))
                         }
+
                         else -> {
                             listOf(DecimalFormat("#,##0").format(votes.toLong()), DecimalFormat("0.0%").format(pct))
                         }
@@ -288,7 +291,7 @@ class MultiResultScreen private constructor(
                 val width = parent.width
                 val height = parent.height
                 barFrame.setLocation(5, 5)
-                val barsOnly = !displayBothRows || swingFrame == null && mapFrame == null
+                val barsOnly = !displayBothRows || (swingFrame == null && mapFrame == null)
                 barFrame.setSize(width - 10, height * (if (barsOnly) 3 else 2) / 3 - 10)
                 swingFrame?.setLocation(5, height * 2 / 3 + 5)
                 swingFrame?.setSize(width / (if (mapFrame == null) 1 else 2) - 10, height / 3 - 10)

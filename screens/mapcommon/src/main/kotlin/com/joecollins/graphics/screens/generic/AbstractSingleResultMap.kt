@@ -57,8 +57,11 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
                 mapFocus != null && additionalFocusShapes != null -> mapFocus.merge(additionalFocusShapes) { a, b ->
                     listOfNotNull(a, b).takeIf { it.isNotEmpty() }?.flatten()
                 }
+
                 mapFocus != null -> mapFocus
+
                 additionalFocusShapes != null -> additionalFocusShapes
+
                 else -> null.asOneTimePublisher()
             }
             val allFadedShapes = when {

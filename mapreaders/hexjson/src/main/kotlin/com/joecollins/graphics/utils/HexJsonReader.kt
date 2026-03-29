@@ -65,6 +65,7 @@ object HexJsonReader {
                         hex.r * (1.5 * LENGTH + GAP),
                     ).createTransformedShape(flatSide)
                 }
+
                 HexLayout.ODD_Q, HexLayout.EVEN_Q -> run {
                     val shift = hex.q.absoluteValue % 2 == (if (rootNode.layout == HexLayout.ODD_Q) 1 else 0)
                     AffineTransform.getTranslateInstance(

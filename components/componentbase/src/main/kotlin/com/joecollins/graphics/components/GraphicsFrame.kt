@@ -223,6 +223,7 @@ open class GraphicsFrame(
                     mainWidth + 2 * max(leftWidth, rightWidth) < parent.width -> parent.width - 2 * (max(leftWidth, rightWidth) * ratio).roundToInt()
                     else -> (mainWidth * ratio).roundToInt()
                 }
+
                 else -> parent.width - (leftWidthFinal + rightWidthFinal)
             }
             val mainLeftFinal = when (alignment) {
@@ -230,6 +231,7 @@ open class GraphicsFrame(
                     mainWidth + 2 * max(leftWidth, rightWidth) < parent.width -> (max(leftWidth, rightWidth) * ratio).roundToInt()
                     else -> (max(leftWidth, parent.width - mainWidth - rightWidth) * ratio).roundToInt()
                 }
+
                 else -> leftWidthFinal
             }
 
