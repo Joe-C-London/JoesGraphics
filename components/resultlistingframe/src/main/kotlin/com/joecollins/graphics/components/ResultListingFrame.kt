@@ -23,11 +23,13 @@ class ResultListingFrame(
     borderColorPublisher: Flow.Publisher<out Color>? = null,
     headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
+    headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     borderColorPublisher = borderColorPublisher,
     headerAlignmentPublisher = headerAlignmentPublisher,
     notesPublisher = notesPublisher,
+    headerLabelsPublisher = headerLabelsPublisher,
 ) {
     private val centralPanel = JPanel()
     private val layout = Layout()
