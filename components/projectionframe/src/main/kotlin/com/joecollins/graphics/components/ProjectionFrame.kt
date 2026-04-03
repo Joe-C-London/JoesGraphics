@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -50,7 +51,14 @@ class ProjectionFrame(
         footerLabel.border = EmptyBorder(15, 0, -15, 0)
 
         imagePublisher.subscribe(Subscriber(eventQueueWrapper { imagePanel.image = it }))
-        backColorPublisher.subscribe(Subscriber(eventQueueWrapper { footerPanel.background = it }))
+        backColorPublisher.subscribe(
+            Subscriber(
+                eventQueueWrapper {
+                    footerPanel.background = it
+                    footerLabel.foreground = ColorUtils.foregroundToContrast(it)
+                },
+            ),
+        )
         footerTextPublisher.subscribe(
             Subscriber(
                 eventQueueWrapper {

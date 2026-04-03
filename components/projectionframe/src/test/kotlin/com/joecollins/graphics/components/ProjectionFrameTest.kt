@@ -111,6 +111,20 @@ class ProjectionFrameTest {
         compareRendering("ProjectionFrame", "Center", frame)
     }
 
+    @Test
+    fun testTextContrastRendering() {
+        val frame = ProjectionFrame(
+            headerPublisher = "PROJECTION".asOneTimePublisher(),
+            borderColorPublisher = Color.CYAN.asOneTimePublisher(),
+            imagePublisher = peiLeg().asOneTimePublisher(),
+            backColorPublisher = Color.CYAN.asOneTimePublisher(),
+            imageAlignmentPublisher = ProjectionFrame.Alignment.MIDDLE.asOneTimePublisher(),
+            footerTextPublisher = "MINORITY LEGISLATURE".asOneTimePublisher(),
+        )
+        frame.setSize(1024, 512)
+        compareRendering("ProjectionFrame", "TextContrast", frame)
+    }
+
     private fun peiLeg(): Image = ImageIO.read(
         ProjectionFrameTest::class.java
             .classLoader
