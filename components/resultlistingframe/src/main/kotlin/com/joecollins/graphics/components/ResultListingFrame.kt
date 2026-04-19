@@ -11,6 +11,8 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.LayoutManager
 import java.awt.RenderingHints
+import java.awt.font.FontRenderContext
+import java.awt.geom.AffineTransform
 import java.util.concurrent.Flow
 import javax.swing.JPanel
 import kotlin.math.ceil
@@ -24,6 +26,7 @@ class ResultListingFrame(
     headerAlignmentPublisher: Flow.Publisher<out Alignment>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     headerLabelsPublisher: Flow.Publisher<out Map<HeaderLabelLocation, String?>>? = null,
+    private val shrinkToFit: Boolean = false,
 ) : GraphicsFrame(
     headerPublisher = headerPublisher,
     borderColorPublisher = borderColorPublisher,
@@ -116,7 +119,12 @@ class ResultListingFrame(
             g.setColor(background)
             g.fillRect(3, 3, width - 6, height - 6)
             g.setColor(foreground)
-            val fontSize = (height - 8).coerceAtMost(24)
+            var fontSize = (height - 8).coerceAtMost(24)
+            if (shrinkToFit) {
+                val frc = FontRenderContext(AffineTransform(), true, true)
+                fontSize = (fontSize downTo 2)
+                    .first { it == 2 || StandardFont.readBoldFont(it).getStringBounds(text, frc).width <= width - 16 }
+            }
             g.setFont(StandardFont.readBoldFont(fontSize))
             val oldClip = g.getClip()
             g.setClip(3, 3, width - 6, height - 6)
