@@ -311,6 +311,36 @@ class CountdownScreenTest {
         )
     }
 
+    @Test
+    fun testCountdownShowUnmatchedShapes() {
+        val screen = CountdownScreen.forDateWithMap(
+            date = LocalDate.of(2023, 10, 2),
+            times = listOf(
+                timeWithMapFilter {
+                    header = "PRINCE EDWARD ISLAND"
+                    time = LocalTime.of(19, 0)
+                    zone = ZoneId.of("Canada/Atlantic")
+                    filter = { this != 10 }
+                },
+            ),
+            map = peiShapesByDistrict().asOneTimePublisher(),
+            timesUpLabel = "POLLS CLOSED",
+            showUnmatchedShapes = true,
+            title = "COUNTDOWN TO THE CLOSE".asOneTimePublisher(),
+            clock = Clock.fixed(Instant.parse("2022-08-29T18:58:39.300Z"), ZoneId.of("UTC")),
+        )
+        screen.size = Dimension(1024, 512)
+        compareRendering("CountdownScreen", "CountdownShowUnmatchedShapes", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+            COUNTDOWN TO THE CLOSE
+            
+            PRINCE EDWARD ISLAND: 399:03:01:21
+            """.trimIndent(),
+        )
+    }
+
     private fun peiShapesByDistrict(): Map<Int, Shape> {
         val peiMap = CountdownScreenTest::class.java
             .classLoader

@@ -10,6 +10,7 @@ import com.joecollins.pubsub.TimePublisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
+import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
 import java.awt.BorderLayout
 import java.awt.Color
@@ -91,6 +92,7 @@ class CountdownScreen private constructor(
             timings = times,
             shapes = emptyMap<Unit, Shape>().asOneTimePublisher(),
             timesUpLabel = timesUpLabel,
+            showUnmatchedShapes = false,
             title = title,
             clock = clock,
         )
@@ -131,6 +133,7 @@ class CountdownScreen private constructor(
                 m.associateWith { it }
             },
             timesUpLabel = timesUpLabel,
+            showUnmatchedShapes = false,
             title = title,
             clock = clock,
         )
@@ -146,6 +149,7 @@ class CountdownScreen private constructor(
             times = times,
             map = map,
             timesUpLabel = timesUpLabel,
+            showUnmatchedShapes = false,
             title = title,
             clock = Clock.systemDefaultZone(),
         )
@@ -157,13 +161,49 @@ class CountdownScreen private constructor(
             timesUpLabel: String,
             title: Flow.Publisher<String>,
             clock: Clock,
+        ): CountdownScreen = forDateWithMap(
+            date = date,
+            times = times,
+            map = map,
+            timesUpLabel = timesUpLabel,
+            showUnmatchedShapes = false,
+            title = title,
+            clock = clock,
+        )
+
+        internal fun <K> forDateWithMap(
+            date: LocalDate,
+            times: List<TimeWithFilterPanel<K>>,
+            map: Flow.Publisher<out Map<K, Shape>>,
+            timesUpLabel: String,
+            showUnmatchedShapes: Boolean,
+            title: Flow.Publisher<String>,
+            clock: Clock,
         ): CountdownScreen = createPanel(
             date = date,
             timings = times,
             shapes = map,
             timesUpLabel = timesUpLabel,
+            showUnmatchedShapes = showUnmatchedShapes,
             title = title,
             clock = clock,
+        )
+
+        fun <K> forDateWithMap(
+            date: LocalDate,
+            times: List<TimeWithFilterPanel<K>>,
+            map: Flow.Publisher<out Map<K, Shape>>,
+            timesUpLabel: String,
+            showUnmatchedShapes: Boolean,
+            title: Flow.Publisher<String>,
+        ): CountdownScreen = forDateWithMap(
+            date = date,
+            times = times,
+            map = map,
+            timesUpLabel = timesUpLabel,
+            showUnmatchedShapes = showUnmatchedShapes,
+            title = title,
+            clock = Clock.systemDefaultZone(),
         )
 
         private fun <K> createPanel(
@@ -171,6 +211,7 @@ class CountdownScreen private constructor(
             shapes: Flow.Publisher<out Map<K, Shape>>,
             timings: List<TimePanel<K>>,
             timesUpLabel: String,
+            showUnmatchedShapes: Boolean,
             title: Flow.Publisher<String>,
             clock: Clock,
         ): CountdownScreen {
@@ -208,12 +249,21 @@ class CountdownScreen private constructor(
             topFrames.equaliseHeaderFonts()
             topFrames.forEach { frame -> top.add(frame) }
 
+            val matchedShapes = (colors.indices).map { idx ->
+                timings[idx].filteredShapes(shapes).map { shapes ->
+                    shapes.map { s -> s to colors[idx] }
+                }
+            }.combine().map { it.flatten() }
+            val unmatchedShapes = if (showUnmatchedShapes) {
+                shapes.merge(matchedShapes) { s, m ->
+                    s.values - m.map { it.first }.toSet()
+                }.mapElements { it to Color(224, 224, 224) }
+            } else {
+                null
+            }
+
             val map = MapFrame(
-                shapesPublisher = (colors.indices).map { idx ->
-                    timings[idx].filteredShapes(shapes).map { shapes ->
-                        shapes.map { s -> s to colors[idx] }
-                    }
-                }.combine().map { it.flatten() },
+                shapesPublisher = if (unmatchedShapes != null) matchedShapes.merge(unmatchedShapes) { m, u -> m + u } else matchedShapes,
                 headerPublisher = null.asOneTimePublisher(),
                 borderColorPublisher = Color.WHITE.asOneTimePublisher(),
             )
