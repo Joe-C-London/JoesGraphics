@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -172,7 +173,7 @@ class HeatMapFrame(
         private fun paintSeatBars(g: Graphics) {
             val height = height / if (hasChange()) 2 else 1
             val seatBaseline = height * 4 / 5
-            g.color = if (seatBars.isEmpty()) Color.BLACK else seatBars[0].color
+            g.color = if (seatBars.isEmpty()) Color.BLACK else ColorUtils.contrastForBackground(seatBars[0].color)
             g.drawString(seatBarLabel, 5, seatBaseline)
             val seatBarTop = height / 10
             val seatBarHeight = height * 4 / 5
@@ -189,7 +190,7 @@ class HeatMapFrame(
             val newClip = Area()
             newClip.add(Area(leftClip))
             g.clip = newClip
-            g.color = Color.WHITE
+            g.color = ColorUtils.foregroundToContrast(seatBars.firstOrNull()?.color ?: Color.BLACK)
             g.drawString(seatBarLabel, 5, seatBaseline)
             g.clip = oldClip
         }
@@ -197,7 +198,7 @@ class HeatMapFrame(
         private fun paintChangeBars(g: Graphics) {
             val height = height / if (hasChange()) 2 else 1
             val seatBaseline = height * 4 / 5 + height
-            g.color = if (changeBars.isEmpty()) Color.BLACK else changeBars[0].color
+            g.color = if (changeBars.isEmpty()) Color.BLACK else ColorUtils.contrastForBackground(changeBars[0].color)
             var leftLeft = getLeftPosition(changeBarStart) + 5
             if (changeBars.sumOf { it.size } < 0) {
                 leftLeft -= g.fontMetrics.stringWidth(changeBarLabel) + 10
@@ -242,7 +243,7 @@ class HeatMapFrame(
             }
             val oldClip = g.clip
             g.clip = newClip
-            g.color = Color.WHITE
+            g.color = ColorUtils.foregroundToContrast(changeBars.firstOrNull()?.color ?: Color.BLACK)
             g.drawString(changeBarLabel, leftLeft, seatBaseline)
             g.clip = oldClip
         }
