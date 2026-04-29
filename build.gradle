@@ -67,5 +67,5 @@ jacocoTestReport {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(25)
 }

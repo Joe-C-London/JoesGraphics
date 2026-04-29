@@ -12,6 +12,7 @@ import com.joecollins.models.general.social.mastodon.User
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Test
 import java.awt.Dimension
+import java.net.URI
 import java.net.URL
 import java.time.Instant
 import java.time.ZoneId
@@ -27,10 +28,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
         )
 
         val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
@@ -47,10 +48,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London@mastodon.world",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
         )
 
         val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
@@ -67,10 +68,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
         )
 
         val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
@@ -87,35 +88,35 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
             mentions = listOf(
                 Mention(
                     "NicolaSturgeon",
-                    URL("https://mastodon.snp.scot/@NicolaSturgeon"),
+                    URI("https://mastodon.snp.scot/@NicolaSturgeon").toURL(),
                     "NicolaSturgeon@mastodon.snp.scot",
                 ),
                 Mention(
                     "Douglas4Moray",
-                    URL("https://mastodon.tory.scot/@Douglas4Moray"),
+                    URI("https://mastodon.tory.scot/@Douglas4Moray").toURL(),
                     "Douglas4Moray@mastodon.tory.scot",
                 ),
                 Mention(
                     "AnasSarwar",
-                    URL("https://mastodon.labour.scot/@AnasSarwar"),
+                    URI("https://mastodon.labour.scot/@AnasSarwar").toURL(),
                     "AnasSarwar@mastodon.labour.scot",
                 ),
             ),
             tags = listOf(
                 Tag(
                     "scotparl",
-                    URL("https://mastodon.social/tags/scotparl"),
+                    URI("https://mastodon.social/tags/scotparl").toURL(),
                 ),
                 Tag(
                     "election2021",
-                    URL("https://mastodon.social/tags/election2021"),
+                    URI("https://mastodon.social/tags/election2021").toURL(),
                 ),
             ),
         )
@@ -134,12 +135,12 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
             card = Card(
-                url = URL("https://www.bbc.co.uk/news/world-europe-56757956"),
+                url = URI("https://www.bbc.co.uk/news/world-europe-56757956").toURL(),
                 title = "Mystery tree beast turns out to be croissant",
                 description = "Polish animal welfare officers responding to a call discover the creature is in fact a pastry.",
                 imageURL = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")!!,
@@ -162,10 +163,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
         )
 
         val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
@@ -182,10 +183,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
             mediaAttachments = listOf(
                 MediaAttachment(
                     type = "image",
@@ -208,10 +209,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
         )
 
         val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
@@ -228,15 +229,15 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
             emojis = listOf(
                 Emoji(
                     shortcode = "thread",
-                    url = URL("https://images.emojiterra.com/google/noto-emoji/v2.034/512px/1f9f5.png"),
-                    staticUrl = URL("https://images.emojiterra.com/google/noto-emoji/v2.034/512px/1f9f5.png"),
+                    url = URI("https://images.emojiterra.com/google/noto-emoji/v2.034/512px/1f9f5.png").toURL(),
+                    staticUrl = URI("https://images.emojiterra.com/google/noto-emoji/v2.034/512px/1f9f5.png").toURL(),
                 ),
             ),
         )
@@ -248,7 +249,7 @@ class MastodonFrameTest {
 
     @Test
     fun testError() {
-        val toot = MastodonFrame.fromError("Record not found", URL("https://mastodon.world/api/v1/statuses/123"))
+        val toot = MastodonFrame.fromError("Record not found", URI("https://mastodon.world/api/v1/statuses/123").toURL())
 
         val frame = MastodonFrame(toot.asOneTimePublisher(), timezone = ZoneId.of("Europe/London"))
         frame.size = Dimension(512, 256)
@@ -264,10 +265,10 @@ class MastodonFrameTest {
                 acct = "Joe_C_London",
                 displayName = "Joe C",
                 avatar = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/letter-j.png")!!,
-                url = URL("https://mastodon.world/@Joe_C_London"),
+                url = URI("https://mastodon.world/@Joe_C_London").toURL(),
             ),
             createdAt = Instant.parse("2021-04-15T21:34:17Z"),
-            url = URL("https://mastodon.world/@Joe_C_London/123"),
+            url = URI("https://mastodon.world/@Joe_C_London/123").toURL(),
             poll = Poll(
                 opts = listOf(
                     Poll.Option("Yes", 50),

@@ -1,5 +1,6 @@
 package com.joecollins.models.general.social.twitter
 
+import java.net.URI
 import java.net.URL
 
 class Media(
@@ -8,7 +9,7 @@ class Media(
 ) : com.joecollins.models.general.social.generic.Media {
 
     companion object {
-        fun fromV1(mediaEntity: twitter4j.MediaEntity): Media = Media(URL(mediaEntity.mediaURL), mediaEntity.displayURL)
+        fun fromV1(mediaEntity: twitter4j.MediaEntity): Media = Media(URI(mediaEntity.mediaURL).toURL(), mediaEntity.displayURL)
 
         fun fromV2(urlEntity: com.twitter.clientlib.model.UrlEntity, media: Map<String, URL>): Media? {
             if (urlEntity.mediaKey == null) return null

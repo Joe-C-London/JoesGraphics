@@ -8,6 +8,7 @@ import com.joecollins.models.general.social.bluesky.User
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Test
 import java.awt.Dimension
+import java.net.URI
 import java.net.URL
 import java.time.Instant
 import java.time.ZoneId
@@ -85,7 +86,7 @@ class BlueskyFrameTest {
                 text = "Go to https://www.bbc.co.uk/news/world-europ... for an amusing story.",
                 createdAt = Instant.parse("2021-04-15T21:34:17Z"),
                 facets = listOf(
-                    Facet(listOf(Facet.Link(URL("https://www.bbc.co.uk/news/world-europe-56757956"))), Facet.ByteSlice(6, 47)),
+                    Facet(listOf(Facet.Link(URI("https://www.bbc.co.uk/news/world-europe-56757956").toURL())), Facet.ByteSlice(6, 47)),
                 ),
             ),
             author = User(
@@ -95,7 +96,7 @@ class BlueskyFrameTest {
             ),
             embed = Embed.External(
                 Embed.External.ViewExternal(
-                    uri = URL("https://www.bbc.co.uk/news/world-europe-56757956"),
+                    uri = URI("https://www.bbc.co.uk/news/world-europe-56757956").toURL(),
                     title = "Mystery tree beast turns out to be croissant",
                     description = "Polish animal welfare officers responding to a call discover the creature is in fact a pastry.",
                     thumb = javaClass.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")!!,
@@ -115,7 +116,7 @@ class BlueskyFrameTest {
                 text = "Go to https://www.bbc.co.uk/news/world-europ... for an amusing story.",
                 createdAt = Instant.parse("2021-04-15T21:34:17Z"),
                 facets = listOf(
-                    Facet(listOf(Facet.Link(URL("https://www.bbc.co.uk/news/world-europe-56757956"))), Facet.ByteSlice(6, 47)),
+                    Facet(listOf(Facet.Link(URI("https://www.bbc.co.uk/news/world-europe-56757956").toURL())), Facet.ByteSlice(6, 47)),
                 ),
             ),
             author = User(

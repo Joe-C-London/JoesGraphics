@@ -32,6 +32,9 @@ hs_err_pid*
 /.idea
 /out
 
+# Claude
+**/.claude
+
 # OAuth passwords are stored here
 twitter.properties
 mastodon.properties

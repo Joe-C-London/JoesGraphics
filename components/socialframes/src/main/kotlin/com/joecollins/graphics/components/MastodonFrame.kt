@@ -12,6 +12,7 @@ import java.awt.Color
 import java.awt.Shape
 import java.awt.geom.Area
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.time.Instant
 import java.time.ZoneId
@@ -41,7 +42,7 @@ class MastodonFrame(
             .registerModule(JavaTimeModule())
         fun createFrame(postId: Flow.Publisher<out Pair<String, Long>>, timezone: ZoneId = ZoneId.systemDefault()): MastodonFrame = MastodonFrame(
             postId.map { (server, id) ->
-                val url = URL("https://$server/api/v1/statuses/$id")
+                val url = URI("https://$server/api/v1/statuses/$id").toURL()
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connect()

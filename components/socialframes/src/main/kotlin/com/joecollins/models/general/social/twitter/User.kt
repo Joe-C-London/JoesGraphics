@@ -1,5 +1,6 @@
 package com.joecollins.models.general.social.twitter
 
+import java.net.URI
 import java.net.URL
 
 class User(
@@ -14,7 +15,7 @@ class User(
         fun fromV1(user: twitter4j.User): User = User(
             "@${user.screenName}",
             user.name,
-            URL(user.profileImageURL),
+            URI(user.profileImageURL).toURL(),
             user.isVerified,
             user.isProtected,
         )

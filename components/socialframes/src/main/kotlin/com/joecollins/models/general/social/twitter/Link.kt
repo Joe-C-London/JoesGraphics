@@ -2,6 +2,7 @@ package com.joecollins.models.general.social.twitter
 
 import io.webfolder.cdp.Launcher
 import java.awt.Image
+import java.net.URI
 import java.net.URL
 import javax.imageio.ImageIO
 
@@ -35,7 +36,7 @@ class Link(
                 sessionFactory.create().use { session ->
                     session.navigate(urlEntity.expandedURL.toString()).waitDocumentReady().wait(5000)
                     val imageURL = session.getAttribute("//meta[@name='twitter:image:src']", "content")
-                    image = imageURL?.let { ImageIO.read(URL(it)) }
+                    image = imageURL?.let { ImageIO.read(URI(it).toURL()) }
                     title = session.getAttribute("//meta[@name='twitter:title']", "content")
                         ?: session.getText("//title")
                     domain = session.getAttribute("//meta[@name='twitter:domain']", "content")
@@ -44,7 +45,7 @@ class Link(
             }
             return Link(
                 urlEntity.url,
-                URL(urlEntity.expandedURL),
+                URI(urlEntity.expandedURL).toURL(),
                 urlEntity.displayURL,
                 image,
                 title,

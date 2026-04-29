@@ -3,6 +3,7 @@ package com.joecollins.models.general.social.twitter
 import com.joecollins.models.general.social.generic.Emoji
 import com.joecollins.models.general.social.generic.Post
 import com.twitter.clientlib.model.Photo
+import java.net.URI
 import java.net.URL
 import java.time.Instant
 
@@ -21,7 +22,7 @@ class Tweet(
 
     override val emojis: List<Emoji> = emptyList()
 
-    override val url: URL = URL("https://twitter.com/${user.screenName}/status/$id")
+    override val url: URL = URI("https://twitter.com/${user.screenName}/status/$id").toURL()
 
     companion object {
         fun fromV1(status: twitter4j.Status): Tweet = Tweet(

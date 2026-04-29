@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.awt.Dimension
 import java.io.File
+import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -398,7 +399,7 @@ class TweetFrameTest {
                 it.end = 29
                 it.description = "Polish animal welfare officers responding to a call discover the creature is in fact a pastry."
                 it.displayUrl = "bbc.co.uk/news/world-eur…"
-                it.expandedUrl = URL("https://t.co/XRFkC6ITop")
+                it.expandedUrl = URI("https://t.co/XRFkC6ITop").toURL()
 
                 it.images = listOf(
                     UrlImage().also { img ->
@@ -409,8 +410,8 @@ class TweetFrameTest {
                 )
                 it.status = 200
                 it.title = "Mystery tree beast turns out to be croissant"
-                it.unwoundUrl = URL("https://www.bbc.co.uk/news/world-europe-56757956")
-                it.url = URL("https://t.co/XRFkC6ITop")
+                it.unwoundUrl = URI("https://www.bbc.co.uk/news/world-europe-56757956").toURL()
+                it.url = URI("https://t.co/XRFkC6ITop").toURL()
             },
         )
 
@@ -437,8 +438,8 @@ class TweetFrameTest {
                 it.start = 69
                 it.end = 92
                 it.displayUrl = "pic.twitter.com/VTphhEAioO"
-                it.url = URL("https://t.co/VTphhEAioO")
-                it.expandedUrl = URL("https://twitter.com/Joe_C_London/status/123/photo/1")
+                it.url = URI("https://t.co/VTphhEAioO").toURL()
+                it.expandedUrl = URI("https://twitter.com/Joe_C_London/status/123/photo/1").toURL()
                 it.mediaKey = "3_456"
             },
         )
@@ -469,8 +470,8 @@ class TweetFrameTest {
                 it.start = 11
                 it.end = 34
                 it.displayUrl = "twitter.com/Joe_C_London/st…"
-                it.url = URL("https://t.co/zgM6sqOuwW")
-                it.expandedUrl = URL("https://twitter.com/Joe_C_London/status/123")
+                it.url = URI("https://t.co/zgM6sqOuwW").toURL()
+                it.expandedUrl = URI("https://twitter.com/Joe_C_London/status/123").toURL()
             },
         )
         tweetBuilder.referencedTweets = listOf(
@@ -493,7 +494,7 @@ class TweetFrameTest {
                 it.start = 69
                 it.end = 92
                 it.displayUrl = "pic.twitter.com/VTphhEAioO"
-                it.url = URL("https://t.co/VTphhEAioO")
+                it.url = URI("https://t.co/VTphhEAioO").toURL()
                 it.expandedUrl = TweetFrameTest::class.java.classLoader.getResource("com/joecollins/graphics/twitter-inputs/croissant.jpg")
                 it.mediaKey = "3_456"
             },
