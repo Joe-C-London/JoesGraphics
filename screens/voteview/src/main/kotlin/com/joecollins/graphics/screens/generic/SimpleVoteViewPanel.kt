@@ -327,6 +327,45 @@ class SimpleVoteViewPanel private constructor(
             ).build()
         }
 
+        fun partyOrCandidateVotes(
+            current: CurrentVotes<PartyOrCandidate, Int?>.() -> Unit,
+            prev: (PrevVotesNoSwing<Party>.() -> Unit)? = null,
+            seats: (Seats<PartyOrCandidate>.() -> Unit),
+            winningLine: (VoteBasedWinningLine.() -> Unit)? = null,
+            displayLimit: (DisplayLimit<Party>.() -> Unit)? = null,
+            map: AbstractMap<*>? = null,
+            title: Flow.Publisher<out String?>,
+        ): SimpleVoteViewPanel {
+            val currentVotes = CurrentVotes<PartyOrCandidate, Int?>().apply(current)
+            return VoteScreenBuilder<PartyOrCandidate, Party, Int?, Double, Double, BarFrameBuilder.BasicBar>(
+                current = currentVotes,
+                prev = prev?.let { PrevVotes<Party>().apply(it) },
+                winningLine = winningLine?.let { VoteBasedWinningLine().apply(it) },
+                displayLimit = displayLimit?.let { DisplayLimit<Party>().apply(it) },
+                partyClassification = null,
+                preferences = null,
+                map = map?.mapFrame,
+                secondMap = null,
+                seats = Seats<PartyOrCandidate>().apply(seats),
+                keyTemplate = BasicResultPanel.PartyOrCandidateTemplate(),
+                voteTemplate = VotePctTemplate,
+                valueTemplate = VoteValueTemplate(VotePctTemplate),
+                others = PartyOrCandidate(Party.OTHERS),
+                title = title,
+                createBarFrame = {
+                    BarFrameBuilder.basic(
+                        barsPublisher = bars,
+                        headerPublisher = header,
+                        rightHeaderLabelPublisher = progress,
+                        subheadPublisher = subhead,
+                        notesPublisher = notes,
+                        limitsPublisher = limits,
+                        linesPublisher = lines,
+                    )
+                },
+            ).build()
+        }
+
         fun partyRangeVotes(
             current: CurrentVotes<PartyOrCoalition, ClosedRange<Double>>.() -> Unit,
             prev: (PrevVotes<PartyOrCoalition>.() -> Unit)? = null,
@@ -1101,6 +1140,12 @@ class SimpleVoteViewPanel private constructor(
         var range: Flow.Publisher<Double>? = null
     }
 
+    class Seats<KT : Any> internal constructor() {
+        lateinit var seats: Flow.Publisher<out Map<KT, Int>>
+        var totalSeats: Flow.Publisher<Int>? = null
+        lateinit var header: Flow.Publisher<out String?>
+    }
+
     sealed class WinningLine {
         private var show: Flow.Publisher<out Boolean>? = null
         private val lines = LinkedList<Line>()
@@ -1256,6 +1301,7 @@ class SimpleVoteViewPanel private constructor(
         private val preferences: Preferences<KT, KPT, CT, Int>?,
         private val map: MapFrame?,
         private val secondMap: MapFrame?,
+        private val seats: Seats<KT>? = null,
         private val keyTemplate: BasicResultPanel.KeyTemplate<KT, KPT>,
         private val voteTemplate: VoteTemplate,
         private val valueTemplate: ValueTemplate<CT, DT, BAR>,
@@ -1336,7 +1382,13 @@ class SimpleVoteViewPanel private constructor(
             createFrame(),
             if (partyClassification == null) createPreferenceFrame() else createClassificationFrame(),
             createDiffFrame(),
-            if (secondMap == null) createSwingFrame() else map,
+            if (seats != null) {
+                createSeatFrame()
+            } else if (secondMap == null) {
+                createSwingFrame()
+            } else {
+                map
+            },
             secondMap ?: map,
             createAltText(),
         )
@@ -1697,6 +1749,25 @@ class SimpleVoteViewPanel private constructor(
             )
         }
 
+        private fun createSeatFrame(): BarFrame? = seats?.run {
+            BarFrame(
+                headerPublisher = header,
+                barsPublisher = seats.map { s ->
+                    s.entries
+                        .sortedByDescending { it.key.overrideSortOrder ?: it.value }
+                        .map {
+                            val party = keyTemplate.toParty(it.key)
+                            BarFrame.Bar.of(
+                                leftText = party.abbreviation,
+                                rightText = it.value.toString(),
+                                series = listOf(party.color to it.value),
+                            )
+                        }
+                },
+                maxPublisher = (totalSeats ?: seats.map { it.values.sum() }).map { it * 2 / 3 },
+            )
+        }
+
         class BarFrameArgs<BAR>(
             val bars: Flow.Publisher<List<BAR>>,
             val header: Flow.Publisher<out String?>,
@@ -1714,6 +1785,7 @@ class SimpleVoteViewPanel private constructor(
             createClassificationAltText(),
             createPreferencesAltText(),
             createSwingAltText(),
+            createSeatsAltText(),
         ).combine()
             .map { list -> list.filterNotNull().joinToString("\n\n") }
             .map { text -> { text } }
@@ -1903,6 +1975,13 @@ class SimpleVoteViewPanel private constructor(
 
         private fun createSwingAltText(): Flow.Publisher<String?> = createSwingFrame()?.altText?.merge((preferences?.prevProps?.swingProps ?: prev?.swingProps)?.header ?: null.asOneTimePublisher()) { bottom, header ->
             "${header?.let { "$it: " }}$bottom"
+        } ?: null.asOneTimePublisher()
+
+        private fun createSeatsAltText(): Flow.Publisher<String?> = seats?.run {
+            header.merge(seats) { h, s ->
+                (listOfNotNull(h) + s.entries.sortedByDescending { it.key.overrideSortOrder ?: it.value }.map { "${keyTemplate.toParty(it.key).abbreviation}: ${it.value}" })
+                    .joinToString("\n")
+            }
         } ?: null.asOneTimePublisher()
 
         private fun createHeaderAltText(header: Flow.Publisher<out String?>?, subhead: Flow.Publisher<out String?>?, progress: Flow.Publisher<out String?>?): Flow.Publisher<String?> {
