@@ -61,6 +61,11 @@ class TooCloseToCallScreen private constructor(
                 field = value
                 update()
             }
+        var showZeroes = false
+            set(value) {
+                field = value
+                update()
+            }
 
         private val entriesPublisher = Publisher(calculateEntries())
         fun toEntries() = entriesPublisher
@@ -77,7 +82,7 @@ class TooCloseToCallScreen private constructor(
                     numCandidates,
                 )
             }
-            .filter { it.votes.values.sum() > 0 }
+            .filter { showZeroes || it.votes.values.sum() > 0 }
             .filter { it.declared != true }
             .sortedBy { sortOrder.sortOrder(it).toDouble() }
             .take(maxRows)
@@ -145,6 +150,7 @@ class TooCloseToCallScreen private constructor(
             header: Flow.Publisher<out String?>,
             title: Flow.Publisher<out String?>,
             showLead: Boolean = true,
+            showZeroes: Boolean = false,
         ): TooCloseToCallScreen {
             val input = Input<T, CT>()
             entries.compose { set -> Aggregators.toMap(set) { votes.votes(it) } }.subscribe(Subscriber { input.votes = it })
@@ -154,6 +160,7 @@ class TooCloseToCallScreen private constructor(
             maxRows?.subscribe(Subscriber { input.maxRows = it })
             numCandidates?.subscribe(Subscriber { input.numCandidates = it })
             input.sortOrder = sortOrder
+            input.showZeroes = showZeroes
             return TooCloseToCallScreen(
                 title,
                 createFrame(header, input, votes, reporting, showLead),
@@ -225,12 +232,16 @@ class TooCloseToCallScreen private constructor(
                     var dotDotDot = false
                     val entriesText = entries.mapNotNull { e ->
                         val total = e.votes.values.sum().toDouble()
-                        val entry = "${e.header}: ${
-                            e.topCandidates.take(e.numCandidates).joinToString("; ") { c ->
-                                "${vote.label(c.key)}: ${input.sortOrder.candidateDisplay(c.value, total) }"
-                            }
-                        }" + (if (showLead) "; LEAD: ${input.sortOrder.leadString(e)}" else "") +
-                            (if (e.reporting.isEmpty()) "" else "; ${e.reporting}")
+                        val entry = if (e.votes.isEmpty()) {
+                            "${e.header}: NO RESULTS YET"
+                        } else {
+                            "${e.header}: ${
+                                e.topCandidates.take(e.numCandidates).joinToString("; ") { c ->
+                                    "${vote.label(c.key)}: ${input.sortOrder.candidateDisplay(c.value, total)}"
+                                }
+                            }" + (if (showLead) "; LEAD: ${input.sortOrder.leadString(e)}" else "") +
+                                (if (e.reporting.isEmpty()) "" else "; ${e.reporting}")
+                        }
                         if (dotDotDot) {
                             null
                         } else if (size + entry.length < maxLength - 10) {

@@ -948,6 +948,171 @@ class TooCloseToCallScreenTest {
         )
     }
 
+    @Test
+    fun testShowZeroes() {
+        val candidateVotesRaw: MutableMap<Int, Map<Candidate, Int>> = HashMap()
+        val partyResultsRaw: MutableMap<Int, PartyResult> = HashMap()
+        val candidateVotes = Publisher<Map<Int, Map<Candidate, Int>>>(candidateVotesRaw)
+        val partyResults = Publisher<Map<Int, PartyResult>>(partyResultsRaw)
+        val screen = TooCloseToCallScreen.of(
+            entries = (1..27).toSet().asOneTimePublisher(),
+            votes = candidateVotes { candidateVotes.map { v -> v[this] ?: emptyMap() } },
+            result = { partyResults.map { v -> v[this] } },
+            label = { "DISTRICT $this".asOneTimePublisher() },
+            header = "TOO CLOSE TO CALL".asOneTimePublisher(),
+            title = "PRINCE EDWARD ISLAND".asOneTimePublisher(),
+            showZeroes = true,
+        )
+        screen.setSize(1024, 512)
+        compareRendering("TooCloseToCallScreen", "ShowZeroes-1", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+
+                TOO CLOSE TO CALL
+                DISTRICT 1: NO RESULTS YET
+                DISTRICT 2: NO RESULTS YET
+                DISTRICT 3: NO RESULTS YET
+                DISTRICT 4: NO RESULTS YET
+                DISTRICT 5: NO RESULTS YET
+                DISTRICT 6: NO RESULTS YET
+                DISTRICT 7: NO RESULTS YET
+                DISTRICT 8: NO RESULTS YET
+                DISTRICT 9: NO RESULTS YET
+                DISTRICT 10: NO RESULTS YET
+                DISTRICT 11: NO RESULTS YET
+                DISTRICT 12: NO RESULTS YET
+                DISTRICT 13: NO RESULTS YET
+                DISTRICT 14: NO RESULTS YET
+                DISTRICT 15: NO RESULTS YET
+                DISTRICT 16: NO RESULTS YET
+                DISTRICT 17: NO RESULTS YET
+                DISTRICT 18: NO RESULTS YET
+                DISTRICT 19: NO RESULTS YET
+                DISTRICT 20: NO RESULTS YET
+                DISTRICT 21: NO RESULTS YET
+                DISTRICT 22: NO RESULTS YET
+                DISTRICT 23: NO RESULTS YET
+                DISTRICT 24: NO RESULTS YET
+                DISTRICT 25: NO RESULTS YET
+                DISTRICT 26: NO RESULTS YET
+                DISTRICT 27: NO RESULTS YET
+            """.trimIndent(),
+        )
+
+        setupFirstAdvancePoll(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "ShowZeroes-2", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                DISTRICT 2: NO RESULTS YET
+                DISTRICT 3: NO RESULTS YET
+                DISTRICT 4: NO RESULTS YET
+                DISTRICT 5: NO RESULTS YET
+                DISTRICT 6: NO RESULTS YET
+                DISTRICT 7: NO RESULTS YET
+                DISTRICT 8: NO RESULTS YET
+                DISTRICT 9: NO RESULTS YET
+                DISTRICT 10: NO RESULTS YET
+                DISTRICT 11: NO RESULTS YET
+                DISTRICT 12: NO RESULTS YET
+                DISTRICT 13: NO RESULTS YET
+                DISTRICT 14: NO RESULTS YET
+                DISTRICT 15: NO RESULTS YET
+                DISTRICT 16: NO RESULTS YET
+                DISTRICT 17: NO RESULTS YET
+                DISTRICT 18: NO RESULTS YET
+                DISTRICT 19: NO RESULTS YET
+                DISTRICT 20: NO RESULTS YET
+                DISTRICT 21: NO RESULTS YET
+                DISTRICT 22: NO RESULTS YET
+                DISTRICT 23: NO RESULTS YET
+                DISTRICT 24: NO RESULTS YET
+                DISTRICT 25: NO RESULTS YET
+                DISTRICT 26: NO RESULTS YET
+                DISTRICT 27: NO RESULTS YET
+                DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+            """.trimIndent(),
+        )
+
+        setupAllAdvancePolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Basic-3", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                DISTRICT 12: LIB: 478; GRN: 475; LEAD: 3
+                DISTRICT 23: PC: 436; GRN: 428; LEAD: 8
+                DISTRICT 8: LIB: 620; PC: 609; LEAD: 11
+                DISTRICT 26: PC: 700; LIB: 686; LEAD: 14
+                DISTRICT 5: PC: 533; LIB: 518; LEAD: 15
+                DISTRICT 25: LIB: 454; NDP: 425; LEAD: 29
+                DISTRICT 21: GRN: 617; PC: 577; LEAD: 40
+                DISTRICT 11: GRN: 636; PC: 595; LEAD: 41
+                DISTRICT 22: GRN: 602; LIB: 560; LEAD: 42
+                DISTRICT 24: LIB: 330; GRN: 197; LEAD: 133
+                DISTRICT 15: PC: 583; LIB: 425; LEAD: 158
+                DISTRICT 13: LIB: 717; GRN: 542; LEAD: 175
+                DISTRICT 6: PC: 725; LIB: 526; LEAD: 199
+                DISTRICT 14: LIB: 699; PC: 492; LEAD: 207
+                DISTRICT 1: PC: 684; LIB: 467; LEAD: 217
+                DISTRICT 9: PC: 620; LIB: 395; LEAD: 225
+                DISTRICT 27: LIB: 646; PC: 405; LEAD: 241
+                DISTRICT 2: PC: 555; GRN: 308; LEAD: 247
+                DISTRICT 10: LIB: 808; GRN: 516; LEAD: 292
+                DISTRICT 16: LIB: 983; GRN: 542; LEAD: 441
+            """.trimIndent(),
+        )
+
+        setupHalfOfPolls(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Basic-4", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                DISTRICT 26: LIB: 919; PC: 890; LEAD: 29
+                DISTRICT 13: LIB: 952; GRN: 840; LEAD: 112
+                DISTRICT 8: PC: 948; LIB: 832; LEAD: 116
+                DISTRICT 5: GRN: 871; PC: 743; LEAD: 128
+                DISTRICT 12: GRN: 831; LIB: 639; LEAD: 192
+                DISTRICT 24: LIB: 774; GRN: 582; LEAD: 192
+                DISTRICT 14: LIB: 874; GRN: 660; LEAD: 214
+                DISTRICT 15: PC: 909; LIB: 652; LEAD: 257
+                DISTRICT 9: PC: 807; GRN: 533; LEAD: 274
+                DISTRICT 6: PC: 995; LIB: 684; LEAD: 311
+                DISTRICT 16: LIB: 1,286; GRN: 819; LEAD: 467
+            """.trimIndent(),
+        )
+
+        setupFullResults(candidateVotesRaw, partyResultsRaw, HashMap(), HashMap())
+        candidateVotes.submit(candidateVotesRaw)
+        partyResults.submit(partyResultsRaw)
+        compareRendering("TooCloseToCallScreen", "Basic-1", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+                PRINCE EDWARD ISLAND
+                
+                TOO CLOSE TO CALL
+                (empty)
+            """.trimIndent(),
+        )
+    }
+
     private fun <R : PartyResult?> setupFirstAdvancePoll(
         candidateVotes: MutableMap<Int, Map<Candidate, Int>>,
         partyResults: MutableMap<Int, R>,
