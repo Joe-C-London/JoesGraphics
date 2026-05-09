@@ -179,13 +179,6 @@ class GenericWindow<T : JPanel> constructor(private val panel: T, title: String)
                     },
                 ),
             )
-            panel.progress?.subscribe(
-                Subscriber(
-                    eventQueueWrapper {
-                        Taskbar.getTaskbar().setProgressValue((it * 100).roundToInt())
-                    },
-                ),
-            )
         }
         contentPane.add(altText, "alt-text")
         val menuBar = JMenuBar()

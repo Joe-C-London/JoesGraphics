@@ -38,13 +38,6 @@ open class GenericPanelWithLowerThird(
             null
         }
 
-    override val progress: Flow.Publisher<Double>? =
-        if (panel is TaskbarProvider) {
-            panel.progress
-        } else {
-            null
-        }
-
     final override fun add(comp: Component, constraints: Any?) {
         super.add(comp, constraints)
     }
