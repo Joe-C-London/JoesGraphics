@@ -97,7 +97,6 @@ class MultiSummaryFrame(
             border = MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY)
             headerLabel = FontSizeAdjustingLabel()
             headerLabel.font = StandardFont.readBoldFont(16)
-            headerLabel.border = EmptyBorder(4, 0, -4, 0)
             add(headerLabel)
             addComponentListener(
                 object : ComponentAdapter() {
@@ -105,10 +104,9 @@ class MultiSummaryFrame(
                         val height = height.coerceAtMost(24)
                         val font = StandardFont.readBoldFont(height * 2 / 3)
                         headerLabel.font = font
+                        headerLabel.border = EmptyBorder(1, 0, 0, 0)
                         labels.forEach { label -> label.font = font }
-                        val border = EmptyBorder(height / 6, 0, -height / 6, 0)
-                        headerLabel.border = border
-                        labels.forEach { label -> label.border = border }
+                        labels.forEach { label -> label.border = EmptyBorder(1, 0, 0, 0) }
                     }
                 },
             )
@@ -141,7 +139,6 @@ class MultiSummaryFrame(
                     val panel = JPanel()
                     val label = FontSizeAdjustingLabel()
                     label.font = entry.headerLabel.font
-                    label.border = entry.headerLabel.border
                     label.horizontalAlignment = JLabel.CENTER
                     panel.layout = GridLayout(1, 1)
                     panel.add(label)

@@ -185,10 +185,9 @@ abstract class SocialMediaFrame<P : Post>(
 
         postPanel.add(Box.createVerticalGlue())
 
-        val timeLabel = JLabel()
+        val timeLabel = FontSizeAdjustingLabel()
         timeLabel.font = StandardFont.readNormalFont(12)
         timeLabel.foreground = Color.BLACK
-        timeLabel.border = EmptyBorder(2, 0, -2, 0)
         timeLabel.horizontalAlignment = JLabel.RIGHT
         post.map { if (it.user.isProtected) null else it.createdAt }.subscribe(
             Subscriber(
@@ -445,10 +444,9 @@ abstract class SocialMediaFrame<P : Post>(
 
             postPanel.add(Box.createVerticalGlue())
 
-            val timeLabel = JLabel()
+            val timeLabel = FontSizeAdjustingLabel()
             timeLabel.font = StandardFont.readNormalFont(12)
             timeLabel.foreground = Color.BLACK
-            timeLabel.border = EmptyBorder(2, 0, -2, 0)
             timeLabel.horizontalAlignment = JLabel.RIGHT
             timeLabel.text =
                 if (quotedStatus.user.isProtected) {

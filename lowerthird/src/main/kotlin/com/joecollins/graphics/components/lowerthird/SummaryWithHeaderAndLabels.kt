@@ -49,7 +49,6 @@ class SummaryWithHeaderAndLabels(
             it.font = StandardFont.readNormalFont(16)
             it.horizontalAlignment = JLabel.CENTER
             it.foreground = Color.WHITE
-            it.border = EmptyBorder(3, 0, -3, 0)
         }
 
         var top: String
@@ -78,13 +77,12 @@ class SummaryWithHeaderAndLabels(
             it.font = StandardFont.readNormalFont(10)
             it.horizontalAlignment = JLabel.CENTER
             it.foreground = Color.BLACK
-            it.border = EmptyBorder(2, 0, 0, 0)
+            it.border = EmptyBorder(1, 0, -1, 0)
         }
         val bottomValueLabel: JLabel = FontSizeAdjustingLabel().also {
             it.font = StandardFont.readBoldFont(20)
             it.horizontalAlignment = JLabel.CENTER
             it.foreground = Color.BLACK
-            it.border = EmptyBorder(0, 0, -4, 0)
         }
 
         init {

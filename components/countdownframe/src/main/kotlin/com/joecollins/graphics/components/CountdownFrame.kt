@@ -18,7 +18,6 @@ import java.time.temporal.Temporal
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 class CountdownFrame(
     headerPublisher: Flow.Publisher<out String>,
@@ -50,12 +49,10 @@ class CountdownFrame(
         timeRemainingLabel.font = StandardFont.readBoldFont(24)
         timeRemainingLabel.horizontalAlignment = JLabel.CENTER
         timeRemainingLabel.verticalAlignment = JLabel.CENTER
-        timeRemainingLabel.border = EmptyBorder(3, 0, -3, 0)
 
         additionalInfoLabel.font = StandardFont.readNormalFont(12)
         additionalInfoLabel.horizontalAlignment = JLabel.CENTER
         additionalInfoLabel.verticalAlignment = JLabel.CENTER
-        additionalInfoLabel.border = EmptyBorder(2, 0, -2, 0)
 
         val panel = JPanel()
         panel.background = Color.WHITE

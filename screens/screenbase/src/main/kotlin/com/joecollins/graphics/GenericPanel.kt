@@ -55,7 +55,7 @@ open class GenericPanel(
             ),
         )
         this.label.horizontalAlignment = JLabel.CENTER
-        this.label.border = EmptyBorder(5, 0, -5, 0)
+        this.label.border = EmptyBorder(2, 0, -2, 0)
         this.label.font = StandardFont.readBoldFont(32)
         background = Color.WHITE
         layout = BorderLayout()

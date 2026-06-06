@@ -19,7 +19,6 @@ import java.util.concurrent.Flow
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -79,7 +78,6 @@ open class GraphicsFrame(
             foreground = Color.WHITE
             horizontalAlignment = JLabel.CENTER
             font = HEADER_FONT
-            border = EmptyBorder(3, 0, -3, 0)
         }
         headerPanel.add(headerLabel)
 
@@ -87,7 +85,6 @@ open class GraphicsFrame(
             foreground = Color.BLACK
             horizontalAlignment = JLabel.RIGHT
             font = StandardFont.readNormalFont(12)
-            border = EmptyBorder(2, 0, -2, 0)
         }
         add(notesLabel, BorderLayout.SOUTH)
 
@@ -95,7 +92,6 @@ open class GraphicsFrame(
             FontSizeAdjustingLabel().apply {
                 font = ADDITIONAL_HEADER_FONT
                 horizontalAlignment = JLabel.CENTER
-                border = EmptyBorder(3, 0, -3, 0)
                 foreground = Color.BLACK
             }
         }

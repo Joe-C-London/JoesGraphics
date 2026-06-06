@@ -14,7 +14,6 @@ import java.awt.LayoutManager
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class SummaryWithoutLabels(
@@ -47,7 +46,6 @@ class SummaryWithoutLabels(
             it.font = StandardFont.readNormalFont(16)
             it.horizontalAlignment = JLabel.CENTER
             it.foreground = Color.WHITE
-            it.border = EmptyBorder(3, 0, -3, 0)
         }
 
         var top: String
@@ -76,7 +74,6 @@ class SummaryWithoutLabels(
             it.font = StandardFont.readBoldFont(24)
             it.horizontalAlignment = JLabel.CENTER
             it.foreground = Color.BLACK
-            it.border = EmptyBorder(4, 0, -4, 0)
         }
 
         init {

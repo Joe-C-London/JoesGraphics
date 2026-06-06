@@ -14,7 +14,6 @@ import java.awt.RenderingHints
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 class ProjectionFrame(
     headerPublisher: Flow.Publisher<out String?>,
@@ -48,7 +47,6 @@ class ProjectionFrame(
         footerLabel.font = StandardFont.readBoldFont(72)
         footerLabel.foreground = Color.WHITE
         footerLabel.horizontalAlignment = JLabel.CENTER
-        footerLabel.border = EmptyBorder(15, 0, -15, 0)
 
         imagePublisher.subscribe(Subscriber(eventQueueWrapper { imagePanel.image = it }))
         backColorPublisher.subscribe(

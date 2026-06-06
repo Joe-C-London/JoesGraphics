@@ -5,11 +5,13 @@ import java.awt.Color
 import java.awt.EventQueue
 import java.awt.Font
 import java.awt.Graphics
+import java.awt.Insets
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.font.FontRenderContext
 import java.awt.geom.AffineTransform
 import javax.swing.JLabel
+import kotlin.math.roundToInt
 
 class FontSizeAdjustingLabel() : JLabel() {
 
@@ -23,6 +25,16 @@ class FontSizeAdjustingLabel() : JLabel() {
 
     var renderedFont: Font = super.getFont()
         private set
+
+    private var verticalOffset: Int = 0
+
+    override fun getInsets(): Insets = super.getInsets().let {
+        Insets(it.top + verticalOffset, it.left, it.bottom - verticalOffset, it.right)
+    }
+
+    override fun getInsets(insets: Insets?): Insets = super.getInsets(insets).let {
+        Insets(it.top + verticalOffset, it.left, it.bottom - verticalOffset, it.right)
+    }
 
     override fun setFont(font: Font?) {
         super.setFont(font)
@@ -55,6 +67,7 @@ class FontSizeAdjustingLabel() : JLabel() {
                 .map { font.deriveFont(it.toFloat()) }
                 .first { it.size == minSize || getStringWidth(it, text) <= width - 6 }
             renderedFont = newFont
+            verticalOffset = calculateVerticalOffset(newFont, text)
         }
         repaint()
     }
@@ -62,6 +75,16 @@ class FontSizeAdjustingLabel() : JLabel() {
     private fun getStringWidth(font: Font, text: String?): Double {
         val frc = FontRenderContext(AffineTransform(), true, true)
         return font.getStringBounds(text ?: "", frc).width
+    }
+
+    private fun calculateVerticalOffset(font: Font, text: String?): Int {
+        val str = text?.takeIf { it.isNotBlank() } ?: return 0
+        val frc = FontRenderContext(AffineTransform(), true, true)
+        val fm = getFontMetrics(font)
+        val referenceStr = if (str.count { it.isLowerCase() } >= str.length * 0.5) "Hg" else "H"
+        val visualBounds = font.createGlyphVector(frc, referenceStr).visualBounds
+        val visualCenter = -(visualBounds.y + visualBounds.height / 2).toFloat()
+        return (fm.height * 0.5 - fm.ascent + visualCenter).roundToInt()
     }
 
     companion object {

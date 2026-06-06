@@ -14,7 +14,6 @@ import java.awt.RenderingHints
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import kotlin.math.min
 
 class SwingFrame(
@@ -38,7 +37,6 @@ class SwingFrame(
     init {
         bottomLabel.horizontalAlignment = JLabel.CENTER
         bottomLabel.font = StandardFont.readBoldFont(15)
-        bottomLabel.border = EmptyBorder(2, 0, -2, 0)
         val centerPanel = JPanel()
         centerPanel.background = Color.WHITE
         centerPanel.layout = BorderLayout()

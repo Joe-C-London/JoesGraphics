@@ -178,6 +178,6 @@ class BottomSummary(
 
     companion object {
         private val FONT = StandardFont.readNormalFont(12)
-        private val BORDER = EmptyBorder(3, 2, -3, 2)
+        private val BORDER = EmptyBorder(0, 2, 0, 2)
     }
 }

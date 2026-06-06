@@ -56,7 +56,7 @@ class HeadlinePanel : JPanel() {
         headlineLabel.verticalAlignment = JLabel.CENTER
         headlineLabel.font = StandardFont.readNormalFont(24)
         headlineLabel.foreground = Color.BLACK
-        headlineLabel.border = EmptyBorder(6, 5, -6, 5)
+        headlineLabel.border = EmptyBorder(0, 5, 0, 5)
         add(headlineLabel)
 
         subheadLabel = FontSizeAdjustingLabel()
@@ -66,7 +66,7 @@ class HeadlinePanel : JPanel() {
         subheadLabel.verticalAlignment = JLabel.CENTER
         subheadLabel.font = StandardFont.readNormalFont(16)
         subheadLabel.foreground = Color.BLACK
-        subheadLabel.border = EmptyBorder(3, 5, -3, 5)
+        subheadLabel.border = EmptyBorder(0, 5, 0, 5)
         add(subheadLabel)
     }
 }

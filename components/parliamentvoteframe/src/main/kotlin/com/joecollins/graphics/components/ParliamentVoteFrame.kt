@@ -20,7 +20,6 @@ import java.util.LinkedList
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 
 class ParliamentVoteFrame(
     titlePublisher: Flow.Publisher<out String>,
@@ -72,7 +71,6 @@ class ParliamentVoteFrame(
         val subtitleLabel = FontSizeAdjustingLabel()
         subtitleLabel.font = StandardFont.readNormalFont(16)
         subtitleLabel.horizontalAlignment = JLabel.CENTER
-        subtitleLabel.border = EmptyBorder(4, 0, -4, 0)
         subtitleLabel.foreground = bodyColor
         subtitlePublisher.subscribe(Subscriber(eventQueueWrapper { subtitleLabel.text = it }))
         outerPanel.add(subtitleLabel, BorderLayout.NORTH)

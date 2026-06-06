@@ -13,7 +13,6 @@ import java.awt.LayoutManager
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 
 class FiguresFrame(
@@ -59,11 +58,9 @@ class FiguresFrame(
             layout = EntryLayout()
             nameLabel = FontSizeAdjustingLabel()
             nameLabel.font = StandardFont.readBoldFont(15)
-            nameLabel.border = EmptyBorder(2, 0, -2, 0)
             add(nameLabel)
             descriptionLabel = FontSizeAdjustingLabel()
             descriptionLabel.font = StandardFont.readNormalFont(10)
-            descriptionLabel.border = EmptyBorder(1, 0, -1, 0)
             add(descriptionLabel)
             resultPanel = JPanel()
             resultPanel.layout = GridLayout(1, 1)
@@ -72,7 +69,6 @@ class FiguresFrame(
             resultLabel = FontSizeAdjustingLabel()
             resultLabel.font = StandardFont.readBoldFont(20)
             resultLabel.foreground = Color.WHITE
-            resultLabel.border = EmptyBorder(3, 0, -3, 0)
             resultLabel.horizontalAlignment = JLabel.CENTER
             resultPanel.add(resultLabel)
         }

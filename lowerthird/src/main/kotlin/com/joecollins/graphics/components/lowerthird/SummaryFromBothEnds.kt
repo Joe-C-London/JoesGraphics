@@ -18,7 +18,6 @@ import java.awt.RenderingHints
 import java.util.concurrent.Flow
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.border.EmptyBorder
 import javax.swing.border.MatteBorder
 import kotlin.math.roundToInt
 
@@ -59,7 +58,6 @@ class SummaryFromBothEnds(
             it.font = StandardFont.readNormalFont(16)
             it.horizontalAlignment = JLabel.CENTER
             it.foreground = Color.WHITE
-            it.border = EmptyBorder(3, 0, -3, 0)
         }
 
         var top: String

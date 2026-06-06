@@ -121,21 +121,21 @@ open class LowerThird internal constructor(
             placeLabel.horizontalAlignment = JLabel.CENTER
             placeLabel.verticalAlignment = JLabel.CENTER
             placeLabel.foreground = Color.BLACK
-            placeLabel.border = EmptyBorder(10, 0, 0, 0)
+            placeLabel.border = EmptyBorder(8, 0, 2, 0)
 
-            timeLabel = JLabel(formatter.format(java.time.ZonedDateTime.now(timezone)))
+            timeLabel = FontSizeAdjustingLabel(formatter.format(java.time.ZonedDateTime.now(timezone)))
             timeLabel.font = StandardFont.readBoldFont(24)
             timeLabel.horizontalAlignment = JLabel.CENTER
             timeLabel.verticalAlignment = JLabel.CENTER
             timeLabel.foreground = Color.BLACK
-            timeLabel.border = EmptyBorder(if (showTimeZone) 5 else 0, 0, if (showTimeZone) -5 else 0, 0)
+            timeLabel.border = EmptyBorder(if (showTimeZone) 1 else -4, 0, if (showTimeZone) -1 else 4, 0)
 
-            timezoneLabel = JLabel("UTC")
+            timezoneLabel = FontSizeAdjustingLabel("UTC")
             timezoneLabel.font = StandardFont.readNormalFont(10)
             timezoneLabel.horizontalAlignment = JLabel.CENTER
             timezoneLabel.verticalAlignment = JLabel.CENTER
             timezoneLabel.foreground = Color.BLACK
-            timezoneLabel.border = EmptyBorder(5, 0, 1, 0)
+            timezoneLabel.border = EmptyBorder(3, 0, 3, 0)
         }
 
         fun updateTime() {
@@ -182,7 +182,7 @@ open class LowerThird internal constructor(
                         gridx = 0
                         gridy = 2
                         gridwidth = 1
-                        gridheight = 3
+                        gridheight = 4
                         weightx = 1.0
                         weighty = 1.0
                     }
@@ -195,9 +195,9 @@ open class LowerThird internal constructor(
                         init {
                             fill = BOTH
                             gridx = 0
-                            gridy = 5
+                            gridy = 6
                             gridwidth = 1
-                            gridheight = 1
+                            gridheight = 2
                             weightx = 1.0
                             weighty = 1.0
                         }

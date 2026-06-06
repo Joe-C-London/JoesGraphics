@@ -473,7 +473,7 @@ class BarFrame(
         subheadLabel.font = StandardFont.readBoldFont(20)
         subheadLabel.isVisible = false
         subheadLabel.horizontalAlignment = JLabel.CENTER
-        subheadLabel.verticalAlignment = JLabel.BOTTOM
+        subheadLabel.verticalAlignment = JLabel.CENTER
         subheadLabel.addComponentListener(
             object : ComponentAdapter() {
                 override fun componentResized(e: ComponentEvent) {
