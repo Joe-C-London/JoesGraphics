@@ -95,7 +95,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 increment,
                 partySwings,
             )
-            val altText = createAltText(title, header, partySwings, allParties, prev)
+            val altText = createAltText(title, header, partySwings, allParties, prev, majorityLines)
             return BattlefieldScreen(title, frame, altText)
         }
 
@@ -267,6 +267,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
             partySwings: Flow.Publisher<out Map<Party, Double>?>?,
             allParties: Flow.Publisher<SelectedParties>,
             prevVotes: Flow.Publisher<out Map<T, Map<PartyOrCandidate, Int>>>,
+            showMajority: Flow.Publisher<Boolean>?,
         ): Flow.Publisher<(Int) -> String> {
             val topText = title.merge(header) { t, h -> sequenceOf(t, h).filterNotNull().joinToString("\n") }
             val swingsText = partySwings?.merge(allParties) { swings, parties ->
@@ -300,7 +301,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                 val winner = adjSeats.filterValues { it >= majority }.keys.firstOrNull()
                 (winner?.abbreviation ?: "NO PARTY") +
                     (if (swings == null) " WOULD HAVE MAJORITY ON NO ADVANCES" else " WOULD HAVE MAJORITY ON UNIFORM ADVANCES")
-            }
+            }.run { if (showMajority == null) this else merge(showMajority) { text, show -> text.takeIf { show } } }
             return topText.run {
                 if (swingsText == null) {
                     this
@@ -308,7 +309,7 @@ class BattlefieldScreen private constructor(header: Flow.Publisher<out String?>,
                     merge(swingsText) { t, s -> sequenceOf(t, s).filterNotNull().joinToString("\n\n") }
                 }
             }
-                .merge(majorityText) { t, m -> "$t\n\n$m" }
+                .merge(majorityText) { t, m -> if (m == null) t else "$t\n\n$m" }
                 .map { text -> { text } }
         }
     }
