@@ -3,9 +3,9 @@ package com.joecollins.graphics.components
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
+import org.locationtech.jts.geom.Envelope
 import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.geom.Rectangle2D
 import java.util.concurrent.Flow
 
 object MapFrameBuilder {
@@ -46,12 +46,11 @@ object MapFrameBuilder {
         outline = outline,
     )
 
-    private fun generateBounds(shapes: List<Geometry>?) = shapes
+    // Combine (overlap) the envelopes of all the passed-in geometries into one Envelope.
+    private fun generateBounds(shapes: List<Geometry>?): Envelope? = shapes
         ?.asSequence()
-        ?.map { it.awtBounds() }
+        ?.map { it.envelopeInternal }
         ?.reduceOrNull { a, b ->
-            val ret = Rectangle2D.Double(a.x, a.y, a.width, a.height)
-            ret.add(b)
-            ret
+            Envelope(a).apply { expandToInclude(b) }
         }
 }

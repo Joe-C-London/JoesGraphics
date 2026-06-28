@@ -7,10 +7,10 @@ import com.joecollins.pubsub.mapElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Envelope
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.awt.Color
-import java.awt.geom.Rectangle2D
 
 class MapFrameBuilderTest {
     private val gf = GeometryFactory()
@@ -48,7 +48,7 @@ class MapFrameBuilderTest {
         assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test
@@ -69,7 +69,7 @@ class MapFrameBuilderTest {
         assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test
@@ -94,7 +94,7 @@ class MapFrameBuilderTest {
         assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test
@@ -141,7 +141,7 @@ class MapFrameBuilderTest {
             focus = focus,
         )
 
-        assertEquals(Rectangle2D.Double(2.0, -3.0, 1.0, 1.0), frame.focusBox)
+        assertEquals(Envelope(2.0, 3.0, 2.0, 3.0), frame.focusBox)
     }
 
     @Test
@@ -158,7 +158,7 @@ class MapFrameBuilderTest {
             header = "MAP".asOneTimePublisher(),
             focus = focus,
         )
-        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test

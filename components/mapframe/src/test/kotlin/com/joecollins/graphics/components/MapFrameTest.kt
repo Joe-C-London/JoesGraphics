@@ -6,10 +6,10 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Envelope
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.awt.Color
-import java.awt.geom.Rectangle2D
 
 class MapFrameTest {
     @Test
@@ -32,11 +32,9 @@ class MapFrameTest {
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         val bindingBox = shapes.asSequence()
-            .map { it.shape.awtBounds() }
+            .map { it.shape.envelopeInternal }
             .reduce { acc, b ->
-                val ret = Rectangle2D.Double(acc.x, acc.y, acc.width, acc.height)
-                ret.add(b)
-                ret
+                Envelope(acc).apply { expandToInclude(b) }
             }
         assertEquals(bindingBox, mapFrame.focusBox)
     }
@@ -106,7 +104,7 @@ class MapFrameTest {
         val zoomBox = loadCityBox()
         val regions = shapes.map { it.shape }
         val header = Publisher("PEI")
-        val focusBox = Publisher<Rectangle2D?>(null)
+        val focusBox = Publisher<Envelope?>(null)
         val mapFrame = MapFrame(
             headerPublisher = header,
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
@@ -147,9 +145,9 @@ class MapFrameTest {
         else -> Color.BLACK
     }
 
-    private fun loadCityBox(): Rectangle2D = OverlayNGRobust.union(
+    private fun loadCityBox(): Envelope = OverlayNGRobust.union(
         shapesByDistrict().entries.filter { it.key in 10..14 }.map { it.value },
-    ).awtBounds()
+    ).envelopeInternal
 
     private fun shapesByDistrict(): Map<Int, Geometry> {
         val peiMap = MapFrameTest::class.java

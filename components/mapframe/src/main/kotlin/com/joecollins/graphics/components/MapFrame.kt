@@ -3,6 +3,7 @@ package com.joecollins.graphics.components
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.utils.ExecutorUtils
+import org.locationtech.jts.geom.Envelope
 import org.locationtech.jts.geom.Geometry
 import java.awt.BasicStroke
 import java.awt.Color
@@ -27,7 +28,7 @@ import kotlin.math.sqrt
 class MapFrame(
     headerPublisher: Flow.Publisher<out String?>,
     shapesPublisher: Flow.Publisher<out List<Pair<Geometry, Color>>>,
-    focusBoxPublisher: Flow.Publisher<out Rectangle2D?>? = null,
+    focusBoxPublisher: Flow.Publisher<out Envelope?>? = null,
     outlineShapesPublisher: Flow.Publisher<out List<Geometry>>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
@@ -38,7 +39,7 @@ class MapFrame(
 ) {
     private val executor = ExecutorUtils.createExecutor { Executors.newWorkStealingPool() }
     private var shapesToDraw: List<Pair<Geometry, Color>> = ArrayList()
-    private var focus: Rectangle2D? = null
+    private var focus: Envelope? = null
     private var outlineShapes: List<Geometry> = ArrayList()
     private val geometryToAwt: MutableMap<Geometry, Shape> = HashMap()
     private val transformedShapesCache: MutableMap<Shape, CompletableFuture<Shape>> = HashMap()
@@ -106,16 +107,16 @@ class MapFrame(
 
     internal fun getColor(idx: Int): Color = shapesToDraw[idx].second
 
-    internal val focusBox: Rectangle2D?
+    internal val focusBox: Envelope?
         get() {
             if (focus == null) {
-                var bounds: Rectangle2D? = null
+                var bounds: Envelope? = null
                 for (entry in shapesToDraw) {
-                    val b = entry.first.awtBounds()
+                    val e = entry.first.envelopeInternal
                     if (bounds == null) {
-                        bounds = b
+                        bounds = Envelope(e)
                     } else {
-                        bounds.add(b)
+                        bounds.expandToInclude(e)
                     }
                 }
                 return bounds
@@ -140,10 +141,10 @@ class MapFrame(
                 if (shapesToDraw.isEmpty()) {
                     return
                 }
-                val bounds = focusBox
+                val bounds = focusBox!!
                 val transform = AffineTransform()
-                val boundsWidth = bounds!!.maxX - bounds.minX
-                val boundsHeight = bounds.maxY - bounds.minY
+                val boundsWidth = bounds.width
+                val boundsHeight = bounds.height
                 val xScale = (width - 4) / boundsWidth
                 val yScale = (height - 4) / boundsHeight
                 val scale = min(xScale, yScale)
@@ -151,7 +152,9 @@ class MapFrame(
                 val y = (height - scale * boundsHeight) / 2
                 transform.translate(x, y)
                 transform.scale(scale, scale)
-                transform.translate(-bounds.minX, -bounds.minY)
+                // bounds is a native (y-up) Envelope; geometries render flipped via toAwtShape(),
+                // so the flipped y-range of [minY, maxY] is [-maxY, -minY] => translate by (-minX, maxY).
+                transform.translate(-bounds.minX, bounds.maxY)
                 val inverted = transform.createInverse()
                 val drawArea = inverted.createTransformedShape(
                     Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble()),
@@ -228,7 +231,7 @@ class MapFrame(
         }
         shapesPublisher.subscribe(Subscriber(eventQueueWrapper(onShapesUpdate)))
 
-        val onFocusBoxUpdate: (Rectangle2D?) -> Unit = { focus ->
+        val onFocusBoxUpdate: (Envelope?) -> Unit = { focus ->
             if (this.focus != focus) {
                 this.focus = focus
                 transformedShapesCache.values.forEach { it.cancel(true) }
