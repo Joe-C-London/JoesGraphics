@@ -13,6 +13,7 @@ version '1.0-SNAPSHOT'
 var topLevel = parent.parent
 
 dependencies {
+    api group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
     implementation topLevel.project('components:countdownframe')
     implementation topLevel.project('components:mapframe')
     implementation topLevel.project('pubsub')

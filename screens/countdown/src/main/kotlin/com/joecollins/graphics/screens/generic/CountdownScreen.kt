@@ -12,11 +12,11 @@ import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
+import org.locationtech.jts.geom.Geometry
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.Shape
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -40,7 +40,7 @@ class CountdownScreen private constructor(
     sealed class TimePanel<K> {
         internal abstract val header: String
         internal abstract fun instant(date: LocalDate): Instant
-        internal abstract fun filteredShapes(shapes: Flow.Publisher<out Map<K, Shape>>): Flow.Publisher<out Collection<Shape>>
+        internal abstract fun filteredShapes(shapes: Flow.Publisher<out Map<K, Geometry>>): Flow.Publisher<out Collection<Geometry>>
     }
 
     class TimeWithFilterPanel<K> internal constructor() : TimePanel<K>() {
@@ -51,7 +51,7 @@ class CountdownScreen private constructor(
         var filter: K.() -> Boolean = { true }
 
         override fun instant(date: LocalDate) = ZonedDateTime.of(date.plus(futureDate), time, zone).toInstant()
-        override fun filteredShapes(shapes: Flow.Publisher<out Map<K, Shape>>) = shapes.map { s -> s.entries.filter { it.key.filter() }.map { it.value } }
+        override fun filteredShapes(shapes: Flow.Publisher<out Map<K, Geometry>>) = shapes.map { s -> s.entries.filter { it.key.filter() }.map { it.value } }
     }
 
     class TimeWithoutFilterPanel internal constructor() : TimePanel<Unit>() {
@@ -61,7 +61,7 @@ class CountdownScreen private constructor(
         lateinit var zone: ZoneId
 
         override fun instant(date: LocalDate) = ZonedDateTime.of(date.plus(futureDate), time, zone).toInstant()
-        override fun filteredShapes(shapes: Flow.Publisher<out Map<Unit, Shape>>) = emptyList<Shape>().asOneTimePublisher()
+        override fun filteredShapes(shapes: Flow.Publisher<out Map<Unit, Geometry>>) = emptyList<Geometry>().asOneTimePublisher()
     }
 
     companion object {
@@ -90,7 +90,7 @@ class CountdownScreen private constructor(
         ): CountdownScreen = createPanel(
             date = date,
             timings = times,
-            shapes = emptyMap<Unit, Shape>().asOneTimePublisher(),
+            shapes = emptyMap<Unit, Geometry>().asOneTimePublisher(),
             timesUpLabel = timesUpLabel,
             showUnmatchedShapes = false,
             title = title,
@@ -100,7 +100,7 @@ class CountdownScreen private constructor(
         fun forDateWithMapSingle(
             timestamp: ZonedDateTime,
             header: String,
-            map: Flow.Publisher<Collection<Shape>>,
+            map: Flow.Publisher<Collection<Geometry>>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
         ): CountdownScreen = forDateWithMapSingle(
@@ -115,7 +115,7 @@ class CountdownScreen private constructor(
         internal fun forDateWithMapSingle(
             timestamp: ZonedDateTime,
             header: String,
-            map: Flow.Publisher<Collection<Shape>>,
+            map: Flow.Publisher<Collection<Geometry>>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
             clock: Clock,
@@ -141,7 +141,7 @@ class CountdownScreen private constructor(
         fun <K> forDateWithMap(
             date: LocalDate,
             times: List<TimeWithFilterPanel<K>>,
-            map: Flow.Publisher<out Map<K, Shape>>,
+            map: Flow.Publisher<out Map<K, Geometry>>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
         ): CountdownScreen = forDateWithMap(
@@ -157,7 +157,7 @@ class CountdownScreen private constructor(
         internal fun <K> forDateWithMap(
             date: LocalDate,
             times: List<TimeWithFilterPanel<K>>,
-            map: Flow.Publisher<out Map<K, Shape>>,
+            map: Flow.Publisher<out Map<K, Geometry>>,
             timesUpLabel: String,
             title: Flow.Publisher<String>,
             clock: Clock,
@@ -174,7 +174,7 @@ class CountdownScreen private constructor(
         internal fun <K> forDateWithMap(
             date: LocalDate,
             times: List<TimeWithFilterPanel<K>>,
-            map: Flow.Publisher<out Map<K, Shape>>,
+            map: Flow.Publisher<out Map<K, Geometry>>,
             timesUpLabel: String,
             showUnmatchedShapes: Boolean,
             title: Flow.Publisher<String>,
@@ -192,7 +192,7 @@ class CountdownScreen private constructor(
         fun <K> forDateWithMap(
             date: LocalDate,
             times: List<TimeWithFilterPanel<K>>,
-            map: Flow.Publisher<out Map<K, Shape>>,
+            map: Flow.Publisher<out Map<K, Geometry>>,
             timesUpLabel: String,
             showUnmatchedShapes: Boolean,
             title: Flow.Publisher<String>,
@@ -208,7 +208,7 @@ class CountdownScreen private constructor(
 
         private fun <K> createPanel(
             date: LocalDate,
-            shapes: Flow.Publisher<out Map<K, Shape>>,
+            shapes: Flow.Publisher<out Map<K, Geometry>>,
             timings: List<TimePanel<K>>,
             timesUpLabel: String,
             showUnmatchedShapes: Boolean,

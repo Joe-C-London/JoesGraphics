@@ -2,11 +2,12 @@ package com.joecollins.graphics.utils
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.awt.ShapeWriter
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.Shape
 import java.awt.geom.AffineTransform
 import javax.swing.JPanel
 import kotlin.math.roundToInt
@@ -41,10 +42,13 @@ class HexJsonReaderTest {
         assertShapes(shapes, "EvenQ")
     }
 
-    private fun assertShapes(shapes: Map<String, Shape>, testMethod: String) {
+    private fun assertShapes(shapes: Map<String, Geometry>, testMethod: String) {
         val scaleFactor = 0.1
-        val scaledShapes = shapes.mapValues { (_, shape) ->
-            AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor).createTransformedShape(shape)
+        val shapeWriter = ShapeWriter()
+        val flip = AffineTransform.getScaleInstance(1.0, -1.0)
+        val scaledShapes = shapes.mapValues { (_, geom) ->
+            val awt = flip.createTransformedShape(shapeWriter.toShape(geom))
+            AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor).createTransformedShape(awt)
         }
 
         val bounds = scaledShapes.values.map { it.bounds2D }.reduce { acc, rect -> acc.createUnion(rect) }

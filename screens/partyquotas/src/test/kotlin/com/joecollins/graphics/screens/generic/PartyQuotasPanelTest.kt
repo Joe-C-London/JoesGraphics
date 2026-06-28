@@ -10,8 +10,8 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 
 class PartyQuotasPanelTest {
 
@@ -594,7 +594,7 @@ class PartyQuotasPanelTest {
         )
     }
 
-    private fun niShapesByConstituency(): Map<Int, Shape> {
+    private fun niShapesByConstituency(): Map<Int, Geometry> {
         val niMap = PartyQuotasPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/ni-constituencies.shp")

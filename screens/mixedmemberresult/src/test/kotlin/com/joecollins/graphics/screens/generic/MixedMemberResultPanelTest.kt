@@ -15,8 +15,8 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 
 class MixedMemberResultPanelTest {
     @Test
@@ -1754,7 +1754,7 @@ class MixedMemberResultPanelTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Shape> {
+    private fun peiShapesByDistrict(): Map<Int, Geometry> {
         val peiMap = MixedMemberResultPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")

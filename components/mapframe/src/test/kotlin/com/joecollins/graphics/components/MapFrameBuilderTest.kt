@@ -6,18 +6,36 @@ import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.GeometryFactory
 import java.awt.Color
-import java.awt.Shape
-import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
 
 class MapFrameBuilderTest {
+    private val gf = GeometryFactory()
+
+    private fun rect(x: Double, y: Double, w: Double, h: Double): Geometry = gf.createPolygon(
+        arrayOf(
+            Coordinate(x, y),
+            Coordinate(x + w, y),
+            Coordinate(x + w, y + h),
+            Coordinate(x, y + h),
+            Coordinate(x, y),
+        ),
+    )
+
+    private val redShape get() = rect(2.0, 2.0, 1.0, 1.0)
+    private val blueShape get() = rect(5.0, 5.0, 2.0, 2.0)
+
     @Test
     fun testBasicMapFrame() {
+        val red = redShape
+        val blue = blueShape
         val shapes = Publisher(
             listOf(
-                Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-                Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+                Pair(red, Color.RED),
+                Pair(blue, Color.BLUE),
             ),
         )
         val frame = MapFrameBuilder.from(
@@ -25,40 +43,44 @@ class MapFrameBuilderTest {
             header = "MAP".asOneTimePublisher(),
         )
         assertEquals(2, frame.numShapes)
-        assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
+        assertEquals(red, frame.getShape(0))
         assertEquals(Color.RED, frame.getColor(0))
-        assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
+        assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
     }
 
     @Test
     fun testBasicMapFrameWithListBinding() {
+        val red = redShape
+        val blue = blueShape
         val shapes = listOf(
-            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+            Pair(red, Color.RED),
+            Pair(blue, Color.BLUE),
         )
         val frame: MapFrame = MapFrameBuilder.from(
             shapes = shapes.asOneTimePublisher(),
             header = "MAP".asOneTimePublisher(),
         )
         assertEquals(2, frame.numShapes)
-        assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
+        assertEquals(red, frame.getShape(0))
         assertEquals(Color.RED, frame.getColor(0))
-        assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
+        assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
     }
 
     @Test
     fun testMapPropertyBinding() {
-        class ConstituencyPair(val shape: Shape, val color: Color)
+        class ConstituencyPair(val shape: Geometry, val color: Color)
 
+        val red = redShape
+        val blue = blueShape
         val shapes = listOf(
-            ConstituencyPair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-            ConstituencyPair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+            ConstituencyPair(red, Color.RED),
+            ConstituencyPair(blue, Color.BLUE),
         )
         val frame = MapFrameBuilder.from(
             items = shapes.asOneTimePublisher(),
@@ -67,19 +89,21 @@ class MapFrameBuilderTest {
             header = "MAP".asOneTimePublisher(),
         )
         assertEquals(2, frame.numShapes)
-        assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
+        assertEquals(red, frame.getShape(0))
         assertEquals(Color.RED, frame.getColor(0))
-        assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
+        assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
     }
 
     @Test
     fun testMapItemPropertyBinding() {
+        val red = redShape
+        val blue = blueShape
         val shapes = listOf(
-            Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Publisher(Color.RED)),
-            Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Publisher(Color.BLUE)),
+            Pair(red, Publisher(Color.RED)),
+            Pair(blue, Publisher(Color.BLUE)),
         )
         val frame = MapFrameBuilder.from(
             items = shapes.asOneTimePublisher(),
@@ -88,9 +112,9 @@ class MapFrameBuilderTest {
             header = "MAP".asOneTimePublisher(),
         )
         assertEquals(2, frame.numShapes)
-        assertEquals(Ellipse2D.Double::class.java, frame.getShape(0).javaClass)
+        assertEquals(red, frame.getShape(0))
         assertEquals(Color.RED, frame.getColor(0))
-        assertEquals(Rectangle2D.Double::class.java, frame.getShape(1).javaClass)
+        assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
 
         shapes[0].second.submit(Color.GREEN)
@@ -106,8 +130,8 @@ class MapFrameBuilderTest {
     fun testFocusBox() {
         val shapes = Publisher(
             listOf(
-                Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-                Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+                Pair(redShape, Color.RED),
+                Pair(blueShape, Color.BLUE),
             ),
         )
         val focus = shapes.map { s -> listOf(s[0].first) }
@@ -117,15 +141,15 @@ class MapFrameBuilderTest {
             focus = focus,
         )
 
-        assertEquals(Rectangle2D.Double(2.0, 2.0, 1.0, 1.0), frame.focusBox)
+        assertEquals(Rectangle2D.Double(2.0, -3.0, 1.0, 1.0), frame.focusBox)
     }
 
     @Test
     fun testMultiFocusBox() {
         val shapes = Publisher(
             listOf(
-                Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-                Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+                Pair(redShape, Color.RED),
+                Pair(blueShape, Color.BLUE),
             ),
         )
         val focus = shapes.mapElements { it.first }
@@ -134,15 +158,15 @@ class MapFrameBuilderTest {
             header = "MAP".asOneTimePublisher(),
             focus = focus,
         )
-        assertEquals(Rectangle2D.Double(2.0, 2.0, 5.0, 5.0), frame.focusBox)
+        assertEquals(Rectangle2D.Double(2.0, -7.0, 5.0, 5.0), frame.focusBox)
     }
 
     @Test
     fun testNotes() {
         val shapes = Publisher(
             listOf(
-                Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-                Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+                Pair(redShape, Color.RED),
+                Pair(blueShape, Color.BLUE),
             ),
         )
         val frame = MapFrameBuilder.from(
@@ -157,8 +181,8 @@ class MapFrameBuilderTest {
     fun testBorderColor() {
         val shapes = Publisher(
             listOf(
-                Pair(Ellipse2D.Double(2.0, 2.0, 1.0, 1.0), Color.RED),
-                Pair(Rectangle2D.Double(5.0, 5.0, 2.0, 2.0), Color.BLUE),
+                Pair(redShape, Color.RED),
+                Pair(blueShape, Color.BLUE),
             ),
         )
         val frame = MapFrameBuilder.from(

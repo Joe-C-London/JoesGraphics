@@ -8,8 +8,8 @@ import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Geometry
 import java.awt.Dimension
-import java.awt.Shape
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
@@ -341,7 +341,7 @@ class CountdownScreenTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Shape> {
+    private fun peiShapesByDistrict(): Map<Int, Geometry> {
         val peiMap = CountdownScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")

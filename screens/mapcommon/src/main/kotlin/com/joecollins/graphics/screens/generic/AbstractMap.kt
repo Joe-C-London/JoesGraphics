@@ -1,12 +1,12 @@
 package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.components.MapFrame
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 import java.util.concurrent.Flow
 
 sealed class AbstractMap<T> {
-    lateinit var shapes: Flow.Publisher<out Map<T, Shape>>
+    lateinit var shapes: Flow.Publisher<out Map<T, Geometry>>
     var focus: Flow.Publisher<out Collection<T>?>? = null
     var additionalHighlight: Flow.Publisher<out List<T>?>? = null
     var faded: Flow.Publisher<out Collection<T>?>? = null
@@ -21,11 +21,11 @@ sealed class AbstractMap<T> {
         internal val BACKGROUND_GREY = Color(220, 220, 220)
         internal val FADED_GREY = Color(235, 235, 235)
 
-        internal fun <T> listShapes(shapes: Map<out T, Shape>, keys: Collection<T>?): List<Shape>? = keys
+        internal fun <T> listShapes(shapes: Map<out T, Geometry>, keys: Collection<T>?): List<Geometry>? = keys
             ?.filter { shapes.containsKey(it) }
             ?.map { shapes[it]!! }
 
-        internal fun extractColor(focus: List<Shape>?, faded: List<Shape>?, shape: Shape, winner: Color?): Color {
+        internal fun extractColor(focus: List<Geometry>?, faded: List<Geometry>?, shape: Geometry, winner: Color?): Color {
             val isInFocus = focus.isNullOrEmpty() || focus.contains(shape)
             val isInFaded = faded != null && faded.contains(shape)
             return if (isInFocus) {

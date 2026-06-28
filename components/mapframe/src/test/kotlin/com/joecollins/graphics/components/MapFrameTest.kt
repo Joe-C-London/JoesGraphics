@@ -6,9 +6,9 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.awt.Color
-import java.awt.Shape
-import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
 
 class MapFrameTest {
@@ -32,13 +32,12 @@ class MapFrameTest {
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         val bindingBox = shapes.asSequence()
-            .map { Area(it.shape) }
-            .reduce { acc, area ->
-                val ret = Area(acc)
-                ret.add(area)
+            .map { it.shape.awtBounds() }
+            .reduce { acc, b ->
+                val ret = Rectangle2D.Double(acc.x, acc.y, acc.width, acc.height)
+                ret.add(b)
                 ret
             }
-            .bounds2D
         assertEquals(bindingBox, mapFrame.focusBox)
     }
 
@@ -123,28 +122,21 @@ class MapFrameTest {
 
     private fun loadShapes(colorFunc: (Int) -> Color): List<MapEntry> {
         val shapesByDistrict = shapesByDistrict()
-        return shapesByDistrict.map { (district: Int, shape: Shape) ->
+        return shapesByDistrict.map { (district: Int, shape: Geometry) ->
             val color = colorFunc(district)
             MapEntry(shape, color)
         }
     }
 
-    private fun loadRegions(): List<Shape> {
+    private fun loadRegions(): List<Geometry> {
         val shapesByDistrict = shapesByDistrict()
-        val areaReduce = { lhs: Area, rhs: Area ->
-            val ret = Area(lhs)
-            ret.add(rhs)
-            ret
-        }
         return sequenceOf(
             (1..7).asSequence(),
             (9..14).asSequence(),
             sequenceOf(8..8, 15..20).flatten(),
             (21..27).asSequence(),
         ).map { seq ->
-            seq.map { shapesByDistrict[it] }
-                .map { Area(it) }
-                .reduce(areaReduce)
+            OverlayNGRobust.union(seq.map { shapesByDistrict[it] }.toList())
         }.toList()
     }
 
@@ -155,22 +147,16 @@ class MapFrameTest {
         else -> Color.BLACK
     }
 
-    private fun loadCityBox(): Rectangle2D = shapesByDistrict().entries.asSequence()
-        .filter { it.key in 10..14 }
-        .map { Area(it.value) }
-        .reduce { acc, area ->
-            val ret = Area(acc)
-            ret.add(area)
-            ret
-        }
-        .bounds2D
+    private fun loadCityBox(): Rectangle2D = OverlayNGRobust.union(
+        shapesByDistrict().entries.filter { it.key in 10..14 }.map { it.value },
+    ).awtBounds()
 
-    private fun shapesByDistrict(): Map<Int, Shape> {
+    private fun shapesByDistrict(): Map<Int, Geometry> {
         val peiMap = MapFrameTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return ShapefileReader.readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
-    private class MapEntry(val shape: Shape, val color: Color)
+    private class MapEntry(val shape: Geometry, val color: Color)
 }

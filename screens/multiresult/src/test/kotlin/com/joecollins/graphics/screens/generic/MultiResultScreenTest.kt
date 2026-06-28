@@ -12,8 +12,8 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 import java.util.concurrent.Flow
 class MultiResultScreenTest {
 
@@ -2391,7 +2391,7 @@ class MultiResultScreenTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Shape> {
+    private fun peiShapesByDistrict(): Map<Int, Geometry> {
         val peiMap = MultiResultScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")

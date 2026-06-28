@@ -3,20 +3,20 @@ package com.joecollins.graphics.components
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 import java.awt.geom.Rectangle2D
 import java.util.concurrent.Flow
 
 object MapFrameBuilder {
 
     fun from(
-        shapes: Flow.Publisher<out List<Pair<Shape, Color>>>,
+        shapes: Flow.Publisher<out List<Pair<Geometry, Color>>>,
         header: Flow.Publisher<out String?>,
-        focus: Flow.Publisher<out List<Shape>?>? = null,
+        focus: Flow.Publisher<out List<Geometry>?>? = null,
         notes: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
-        outline: Flow.Publisher<out List<Shape>>? = null,
+        outline: Flow.Publisher<out List<Geometry>>? = null,
     ): MapFrame = MapFrame(
         headerPublisher = header,
         shapesPublisher = shapes,
@@ -28,13 +28,13 @@ object MapFrameBuilder {
 
     fun <T> from(
         items: Flow.Publisher<out List<T>>,
-        shape: T.() -> Shape,
+        shape: T.() -> Geometry,
         color: T.() -> Flow.Publisher<out Color>,
         header: Flow.Publisher<out String?>,
         focus: Flow.Publisher<out List<T>?>? = null,
         notes: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
-        outline: Flow.Publisher<out List<Shape>>? = null,
+        outline: Flow.Publisher<out List<Geometry>>? = null,
     ): MapFrame = from(
         shapes = items.compose { list ->
             list.map { it.color().map { c -> Pair(it.shape(), c) } }.combine()
@@ -46,9 +46,9 @@ object MapFrameBuilder {
         outline = outline,
     )
 
-    private fun generateBounds(shapes: List<Shape>?) = shapes
+    private fun generateBounds(shapes: List<Geometry>?) = shapes
         ?.asSequence()
-        ?.map { it.bounds2D }
+        ?.map { it.awtBounds() }
         ?.reduceOrNull { a, b ->
             val ret = Rectangle2D.Double(a.x, a.y, a.width, a.height)
             ret.add(b)

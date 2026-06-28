@@ -3,6 +3,7 @@ package com.joecollins.graphics.components
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.utils.ExecutorUtils
+import org.locationtech.jts.geom.Geometry
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics
@@ -12,7 +13,6 @@ import java.awt.Shape
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.geom.AffineTransform
-import java.awt.geom.Area
 import java.awt.geom.GeneralPath
 import java.awt.geom.PathIterator
 import java.awt.geom.Point2D
@@ -26,9 +26,9 @@ import kotlin.math.sqrt
 
 class MapFrame(
     headerPublisher: Flow.Publisher<out String?>,
-    shapesPublisher: Flow.Publisher<out List<Pair<Shape, Color>>>,
+    shapesPublisher: Flow.Publisher<out List<Pair<Geometry, Color>>>,
     focusBoxPublisher: Flow.Publisher<out Rectangle2D?>? = null,
-    outlineShapesPublisher: Flow.Publisher<out List<Shape>>? = null,
+    outlineShapesPublisher: Flow.Publisher<out List<Geometry>>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
@@ -37,11 +37,11 @@ class MapFrame(
     borderColorPublisher = borderColorPublisher,
 ) {
     private val executor = ExecutorUtils.createExecutor { Executors.newWorkStealingPool() }
-    private var shapesToDraw: List<Pair<Shape, Color>> = ArrayList()
+    private var shapesToDraw: List<Pair<Geometry, Color>> = ArrayList()
     private var focus: Rectangle2D? = null
-    private var outlineShapes: List<Shape> = ArrayList()
+    private var outlineShapes: List<Geometry> = ArrayList()
+    private val geometryToAwt: MutableMap<Geometry, Shape> = HashMap()
     private val transformedShapesCache: MutableMap<Shape, CompletableFuture<Shape>> = HashMap()
-    private val mergedShapes: MutableMap<List<Shape>, CompletableFuture<Shape>> = HashMap()
 
     private fun createTransformedShape(transform: AffineTransform, shape: Shape): Shape {
         val pathIterator = transform.createTransformedShape(shape).getPathIterator(null)
@@ -102,7 +102,7 @@ class MapFrame(
     internal val numShapes: Int
         get() = shapesToDraw.size
 
-    internal fun getShape(idx: Int): Shape = shapesToDraw[idx].first
+    internal fun getShape(idx: Int): Geometry = shapesToDraw[idx].first
 
     internal fun getColor(idx: Int): Color = shapesToDraw[idx].second
 
@@ -111,10 +111,11 @@ class MapFrame(
             if (focus == null) {
                 var bounds: Rectangle2D? = null
                 for (entry in shapesToDraw) {
+                    val b = entry.first.awtBounds()
                     if (bounds == null) {
-                        bounds = entry.first.bounds2D
+                        bounds = b
                     } else {
-                        bounds.add(entry.first.bounds2D)
+                        bounds.add(b)
                     }
                 }
                 return bounds
@@ -125,7 +126,7 @@ class MapFrame(
     internal val numOutlineShapes: Int
         get() = outlineShapes.size
 
-    internal fun getOutlineShape(idx: Int): Shape = outlineShapes[idx]
+    internal fun getOutlineShape(idx: Int): Geometry = outlineShapes[idx]
 
     init {
         val panel: JPanel = object : JPanel() {
@@ -151,64 +152,42 @@ class MapFrame(
                 transform.translate(x, y)
                 transform.scale(scale, scale)
                 transform.translate(-bounds.minX, -bounds.minY)
-                val inScope: (Shape) -> Boolean
                 val inverted = transform.createInverse()
                 val drawArea = inverted.createTransformedShape(
                     Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble()),
                 )
-                inScope = { s: Shape -> drawArea.intersects(s.bounds) }
+                val inScope = { geom: Geometry -> drawArea.intersects(geom.awtBounds()) }
                 shapesToDraw
                     .asSequence()
                     .filter { inScope(it.first) }
-                    .map {
-                        Pair(
-                            transformedShapesCache.computeIfAbsent(it.first) { shape ->
+                    .groupBy { it.second }
+                    .forEach { (color, entries) ->
+                        val combined = GeneralPath()
+                        var any = false
+                        for ((geom, _) in entries) {
+                            val awt = geometryToAwt.computeIfAbsent(geom) { it.toAwtShape() }
+                            val transformedFuture = transformedShapesCache.computeIfAbsent(awt) { shape ->
                                 CompletableFuture.supplyAsync({
                                     val s = createTransformedShape(transform, shape)
                                     repaint()
                                     s
                                 }, executor)
-                            },
-                            it.second,
-                        )
-                    }
-                    .groupBy { it.second }
-                    .asSequence()
-                    .flatMap { shapeGroup ->
-                        if (shapeGroup.value.all { it.first.isDone }) {
-                            val allShapes = shapeGroup.value.map { it.first.join() }
-                            val mergedShapeFuture = mergedShapes.computeIfAbsent(allShapes) {
-                                CompletableFuture.supplyAsync({
-                                    val ret = it
-                                        .sortedBy { s -> s.bounds.width * s.bounds.height }
-                                        .map { Area(it) }
-                                        .reduceOrNull { a, s ->
-                                            a.add(s)
-                                            a
-                                        }
-                                        ?: Area()
-                                    repaint()
-                                    ret
-                                }, executor)
                             }
-                            if (mergedShapeFuture.isDone) {
-                                return@flatMap sequenceOf(mergedShapeFuture.join() to shapeGroup.key)
+                            if (transformedFuture.isDone) {
+                                combined.append(transformedFuture.join(), false)
+                                any = true
                             }
                         }
-                        shapeGroup.value.asSequence()
-                            .filter { it.first.isDone }
-                            .map { it.first.join() to shapeGroup.key }
-                    }
-                    .forEach {
-                        g2d.color = it.second
-                        g2d.fill(it.first)
+                        if (any) {
+                            g2d.color = color
+                            g2d.fill(combined)
+                        }
                     }
                 outlineShapes
                     .filter { inScope(it) }
-                    .map {
-                        transformedShapesCache.computeIfAbsent(
-                            it,
-                        ) { shape ->
+                    .map { geom ->
+                        val awt = geometryToAwt.computeIfAbsent(geom) { it.toAwtShape() }
+                        transformedShapesCache.computeIfAbsent(awt) { shape ->
                             CompletableFuture.supplyAsync({
                                 val s = createTransformedShape(transform, shape)
                                 repaint()
@@ -238,11 +217,12 @@ class MapFrame(
         }
         addCenter(panel)
 
-        val onShapesUpdate: (List<Pair<Shape, Color>>) -> Unit = { s ->
+        val onShapesUpdate: (List<Pair<Geometry, Color>>) -> Unit = { s ->
             if (this.shapesToDraw != s) {
                 shapesToDraw = s
-                mergedShapes.values.forEach { it.cancel(true) }
-                mergedShapes.clear()
+                geometryToAwt.clear()
+                transformedShapesCache.values.forEach { it.cancel(true) }
+                transformedShapesCache.clear()
             }
             repaint()
         }
@@ -253,8 +233,6 @@ class MapFrame(
                 this.focus = focus
                 transformedShapesCache.values.forEach { it.cancel(true) }
                 transformedShapesCache.clear()
-                mergedShapes.values.forEach { it.cancel(true) }
-                mergedShapes.clear()
             }
             repaint()
         }
@@ -270,8 +248,9 @@ class MapFrame(
             onFocusBoxUpdate(null)
         }
 
-        val onOutlineShapesUpdate: (List<Shape>) -> Unit = { s ->
+        val onOutlineShapesUpdate: (List<Geometry>) -> Unit = { s ->
             outlineShapes = s
+            geometryToAwt.clear()
             repaint()
         }
         if (outlineShapesPublisher != null) {

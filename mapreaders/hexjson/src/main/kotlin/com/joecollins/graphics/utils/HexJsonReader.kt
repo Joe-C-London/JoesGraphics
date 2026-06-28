@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.awt.Shape
+import org.locationtech.jts.awt.ShapeReader
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.GeometryFactory
 import java.awt.geom.AffineTransform
 import java.awt.geom.Path2D
 import java.net.URL
@@ -54,10 +56,12 @@ object HexJsonReader {
         path.closePath()
     }
 
-    fun readHex(file: URL): Map<String, Shape> {
+    private val geometryFactory = GeometryFactory()
+
+    fun readHex(file: URL): Map<String, Geometry> {
         val rootNode: HexJsonFile = objectMapper.readValue(file)
         return rootNode.hexes.mapValues { (_, hex) ->
-            when (rootNode.layout) {
+            val shape = when (rootNode.layout) {
                 HexLayout.ODD_R, HexLayout.EVEN_R -> run {
                     val shift = hex.r.absoluteValue % 2 == (if (rootNode.layout == HexLayout.ODD_R) 1 else 0)
                     AffineTransform.getTranslateInstance(
@@ -73,7 +77,8 @@ object HexJsonReader {
                         (hex.r + (if (shift) 0.5 else 0.0)) * (ROOT_3 * LENGTH + GAP),
                     ).createTransformedShape(flatTop)
                 }
-            }.let { AffineTransform.getScaleInstance(1.0, -1.0).createTransformedShape(it) }
+            }
+            ShapeReader.read(shape.getPathIterator(null), geometryFactory)
         }
     }
 }

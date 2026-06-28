@@ -5,8 +5,8 @@ import com.joecollins.graphics.components.MapFrameBuilder
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 import java.util.concurrent.Flow
 
 abstract class AbstractMultiResultMap<T, R> internal constructor(color: R.() -> Color) : AbstractMap<T>() {
@@ -22,7 +22,7 @@ abstract class AbstractMultiResultMap<T, R> internal constructor(color: R.() -> 
 
     companion object {
         private fun <T> createFrame(
-            shapes: Flow.Publisher<out Map<T, Shape>>,
+            shapes: Flow.Publisher<out Map<T, Geometry>>,
             winners: Flow.Publisher<out Map<T, Color?>>,
             focus: Flow.Publisher<out Collection<T>?>? = null,
             additionalHighlight: Flow.Publisher<out List<T>?>? = null,

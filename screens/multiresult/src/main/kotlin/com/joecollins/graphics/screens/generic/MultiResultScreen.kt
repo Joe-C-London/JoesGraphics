@@ -22,6 +22,7 @@ import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -626,7 +627,7 @@ class MultiResultScreen private constructor(
         }
 
         private val NULL_MAP: AbstractSingleResultMap<*, *> = createSingleResultMap {
-            shapes = emptyMap<Nothing?, Shape>().asOneTimePublisher()
+            shapes = emptyMap<Nothing?, Geometry>().asOneTimePublisher()
             leader = null.asOneTimePublisher()
             selectedShape = null.asOneTimePublisher()
             header = null.asOneTimePublisher()

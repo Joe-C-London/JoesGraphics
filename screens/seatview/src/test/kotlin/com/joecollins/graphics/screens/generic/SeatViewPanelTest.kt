@@ -20,10 +20,10 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.Shape
-import java.awt.geom.Area
 import java.util.IdentityHashMap
 
 class SeatViewPanelTest {
@@ -3013,7 +3013,7 @@ class SeatViewPanelTest {
         )
     }
 
-    private fun peiShapesByRegion(): Map<String, Shape> {
+    private fun peiShapesByRegion(): Map<String, Geometry> {
         val keys = mapOf(
             "Cardigan" to setOf(4, 2, 5, 3, 7, 1, 6),
             "Malpeque" to setOf(19, 15, 16, 20, 17, 18, 8),
@@ -3022,12 +3022,7 @@ class SeatViewPanelTest {
         )
         val shapesByDistrict = peiShapesByDistrict()
         return keys.mapValues { e ->
-            e.value.map { shapesByDistrict[it]!! }
-                .reduce { acc, shape ->
-                    val ret = Area(acc)
-                    ret.add(Area(shape))
-                    ret
-                }
+            OverlayNGRobust.union(e.value.map { shapesByDistrict[it]!! })
         }
     }
 
@@ -3258,7 +3253,7 @@ class SeatViewPanelTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Shape> {
+    private fun peiShapesByDistrict(): Map<Int, Geometry> {
         val peiMap = SeatViewPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")

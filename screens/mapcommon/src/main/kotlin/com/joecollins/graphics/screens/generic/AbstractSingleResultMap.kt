@@ -6,8 +6,8 @@ import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
+import org.locationtech.jts.geom.Geometry
 import java.awt.Color
-import java.awt.Shape
 import java.util.concurrent.Flow
 
 abstract class AbstractSingleResultMap<T, R> internal constructor(private val colorFunc: R?.() -> Color) : AbstractMap<T>() {
@@ -34,7 +34,7 @@ abstract class AbstractSingleResultMap<T, R> internal constructor(private val co
         )
 
         private fun <T> createFrame(
-            shapes: Flow.Publisher<out Map<out T, Shape>>,
+            shapes: Flow.Publisher<out Map<out T, Geometry>>,
             selectedShape: Flow.Publisher<out T>,
             color: Flow.Publisher<out Color>,
             focus: Flow.Publisher<out Collection<T>?>?,

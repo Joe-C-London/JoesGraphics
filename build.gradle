@@ -18,6 +18,7 @@ ext {
     junit_version = "6.0.0"
     junit_platform_version = "6.0.0"
     awaitility_version = "4.3.0"
+    jts_version = "1.20.0"
 }
 
 apply plugin: 'kotlin'
@@ -37,6 +38,12 @@ allprojects {
 
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions.allWarningsAsErrors = true
+    }
+
+    plugins.withId('org.jetbrains.kotlin.jvm') {
+        kotlin {
+            jvmToolchain(25)
+        }
     }
 
     spotless {
@@ -64,8 +71,4 @@ jacocoTestReport {
         csv.required = false
         html.outputLocation = file("${buildDir}/jacocoReports")
     }
-}
-
-kotlin {
-    jvmToolchain(25)
 }

@@ -2,17 +2,15 @@ package com.joecollins.graphics.utils
 
 import org.geotools.api.feature.simple.SimpleFeature
 import org.geotools.data.simple.SimpleFeatureIterator
-import org.locationtech.jts.awt.ShapeWriter
 import org.locationtech.jts.geom.Geometry
-import java.awt.Shape
-import java.awt.geom.AffineTransform
-import java.awt.geom.Area
+import org.locationtech.jts.geom.util.GeometryFixer
+import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.net.URL
 import kotlin.reflect.cast
 
 abstract class GenericReader {
 
-    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Shape> {
+    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Geometry> {
         if (keyType == Int::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
@@ -34,14 +32,14 @@ abstract class GenericReader {
         return readShapes(file) { feature -> keyType.cast(feature[keyProperty]) }
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, Shape> = readShapes(file, keyFunc) { true }
+    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, Geometry> = readShapes(file, keyFunc) { true }
 
     fun <T> readShapes(
         file: URL,
         keyFunc: (Map<String, Any>) -> T,
         filter: (Map<String, Any>) -> Boolean,
-    ): Map<T, Shape> {
-        val shapes: MutableMap<T, Collection<Shape>> = HashMap()
+    ): Map<T, Geometry> {
+        val geometries: MutableMap<T, MutableList<Geometry>> = HashMap()
         var features: SimpleFeatureIterator? = null
         return try {
             features = getFeatureIterator(file)
@@ -53,19 +51,9 @@ abstract class GenericReader {
                 }
                 val key = keyFunc(map)
                 val geom = feature.getAttribute(geometryKey) as Geometry
-                shapes.merge(
-                    key,
-                    listOf(toShape(geom)),
-                ) { s1, s2 ->
-                    s1 + s2
-                }
+                geometries.getOrPut(key) { mutableListOf() }.add(geom.let { if (it.isValid) it else GeometryFixer.fix(it) })
             }
-            shapes.mapValues { (_, s) ->
-                s.sortedBy { it.bounds2D.run { width * height } }
-                    .reduce { s1, s2 ->
-                        Area(s1).apply { add(Area(s2)) }
-                    }
-            }
+            geometries.mapValues { (_, geoms) -> OverlayNGRobust.union(geoms) }
         } finally {
             features?.close()
         }
@@ -74,12 +62,6 @@ abstract class GenericReader {
     protected abstract fun getFeatureIterator(file: URL): SimpleFeatureIterator
 
     protected abstract val geometryKey: String
-
-    private fun toShape(geom: Geometry): Shape {
-        val shapeWriter = ShapeWriter()
-        val transform = AffineTransform.getScaleInstance(1.0, -1.0)
-        return transform.createTransformedShape(shapeWriter.toShape(geom))
-    }
 
     private class WrappedMap(private val feature: SimpleFeature) : Map<String, Any> {
         override val entries: Set<Map.Entry<String, Any>>

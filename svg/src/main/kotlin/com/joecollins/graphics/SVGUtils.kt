@@ -9,6 +9,10 @@ import org.apache.batik.gvt.GraphicsNode
 import org.apache.batik.parser.AWTPathProducer
 import org.apache.batik.parser.PathParser
 import org.apache.batik.util.XMLResourceDescriptor
+import org.locationtech.jts.awt.ShapeReader
+import org.locationtech.jts.geom.Geometry
+import org.locationtech.jts.geom.GeometryFactory
+import org.locationtech.jts.geom.util.GeometryFixer
 import java.awt.Shape
 import java.net.URI
 
@@ -21,6 +25,8 @@ object SVGUtils {
         parser.parse(path)
         return handler.shape
     }
+
+    fun createGeometry(path: String): Geometry = GeometryFixer.fix(ShapeReader.read(createShape(path), 0.1, GeometryFactory()))
 
     fun parseSvg(uri: URI): GraphicsNode {
         val svg = SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName()).createSVGDocument(uri.toString())
