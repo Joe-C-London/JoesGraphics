@@ -10,13 +10,13 @@ buildscript {
     }
 }
 plugins {
-    id "com.github.ben-manes.versions" version "0.53.0"
-    id "com.diffplug.spotless" version "8.4.0"
+    id "com.github.ben-manes.versions" version "0.54.0"
+    id "com.diffplug.spotless" version "8.7.0"
     id "jacoco"
 }
 ext {
-    junit_version = "6.0.0"
-    junit_platform_version = "6.0.0"
+    junit_version = "6.1.0"
+    junit_platform_version = "6.1.0"
     awaitility_version = "4.3.0"
     jts_version = "1.20.0"
 }

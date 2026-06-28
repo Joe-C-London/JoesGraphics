@@ -12,7 +12,7 @@ version '1.0-SNAPSHOT'
 
 def topLevel = parent.parent
 
-def jacksonVersion = '2.21.2'
+def jacksonVersion = '2.22.0'
 
 dependencies {
     api group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
