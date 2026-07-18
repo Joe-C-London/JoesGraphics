@@ -5,19 +5,27 @@ import com.joecollins.graphics.ImageGenerator
 import com.joecollins.graphics.components.BarFrame
 import com.joecollins.graphics.components.BarFrame.Bar.Companion.withIcon
 import com.joecollins.graphics.components.BarFrameBuilder
+import com.joecollins.graphics.components.FontSizeAdjustingLabel
+import com.joecollins.graphics.components.GraphicsFrame
+import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
+import com.joecollins.pubsub.Subscriber
+import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.mapElements
 import com.joecollins.pubsub.merge
+import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.GridLayout
 import java.awt.Shape
 import java.text.DecimalFormat
 import java.util.concurrent.Flow
 import javax.swing.JPanel
+import javax.swing.border.EmptyBorder
 
 class CandidateListingScreen private constructor(
     header: Flow.Publisher<out String?>,
@@ -160,56 +168,114 @@ class CandidateListingScreen private constructor(
 
         private fun <CT> createCandidatesPanel(
             candidates: CandidatesPanel<CT>,
-            showToColumns: Flow.Publisher<Boolean>?,
+            showTwoColumns: Flow.Publisher<Boolean>?,
             leftLabel: CT.() -> String,
             rightLabel: CT.() -> String,
             color: CT.() -> Color,
             combinedLabel: CT.() -> String,
             shape: CT.() -> Shape?,
-        ): BarFrame = BarFrame(
-            barsPublisher = if (showToColumns == null) {
-                candidates.list.mapElements {
-                    BarFrame.Bar.of(
-                        it.leftLabel().withIcon(it.shape()),
-                        it.rightLabel(),
-                        listOf(it.color() to 1.0),
-                    )
+        ): JPanel {
+            if (showTwoColumns == null) {
+                return BarFrame(
+                    barsPublisher = candidates.list.mapElements {
+                        BarFrame.Bar.of(
+                            it.leftLabel().withIcon(it.shape()),
+                            it.rightLabel(),
+                            listOf(it.color() to 1.0),
+                        )
+                    },
+                    headerPublisher = candidates.header,
+                    subheadTextPublisher = candidates.subhead,
+                    maxPublisher = 1.0.asOneTimePublisher(),
+                )
+            }
+            val panel = JPanel().apply {
+                layout = BorderLayout()
+                background = Color.WHITE
+                val subheadLabel = FontSizeAdjustingLabel("").also { label ->
+                    label.font = StandardFont.readBoldFont(16)
+                    candidates.subhead.subscribe(Subscriber(eventQueueWrapper { label.text = if (it.isNullOrBlank()) " " else it }))
                 }
-            } else {
-                candidates.list.merge(showToColumns) { cList, show ->
-                    if (show) {
-                        val mid = cList.size / 2
-                        val first = cList.take(mid)
-                        val last = cList.drop(mid)
-                        (0 until mid).map { idx ->
-                            val left = first[idx]
-                            val right = if (idx == last.size) null else last[idx]
-                            val func = { c: CT -> c.combinedLabel() + " " }
-                            BarFrame.Bar.of(
-                                func(left),
-                                right?.let(func) ?: "",
-                                listOf(
-                                    left.color() to 0.49,
-                                    Color.WHITE to 0.02,
-                                    (right?.color() ?: Color.WHITE) to 0.49,
-                                ),
-                            )
-                        }
-                    } else {
-                        cList.map {
-                            BarFrame.Bar.of(
-                                it.leftLabel(),
-                                it.rightLabel(),
-                                listOf(it.color() to 1.0),
-                            )
-                        }
-                    }
+                add(subheadLabel, BorderLayout.NORTH)
+                showTwoColumns.subscribe(
+                    Subscriber(
+                        eventQueueWrapper {
+                            if (subheadLabel.isVisible != it) {
+                                if (it) add(subheadLabel, BorderLayout.NORTH) else remove(subheadLabel)
+                            }
+                            subheadLabel.isVisible = it
+                        },
+                    ),
+                )
+                add(
+                    JPanel().apply {
+                        layout = GridLayout(1, 0, 5, 5)
+                        background = Color.WHITE
+                        border = EmptyBorder(-1, -1, -1, -1)
+                        val left = BarFrame(
+                            headerPublisher = null.asOneTimePublisher(),
+                            subheadTextPublisher = candidates.subhead.merge(showTwoColumns) { sub, two -> if (two) null else sub },
+                            borderColorPublisher = Color.WHITE.asOneTimePublisher(),
+                            barsPublisher = candidates.list.merge(showTwoColumns) { cList, two ->
+                                val list = if (two) {
+                                    val mid = cList.size / 2
+                                    cList.take(mid)
+                                } else {
+                                    cList
+                                }
+                                list.map {
+                                    BarFrame.Bar.of(
+                                        it.leftLabel().withIcon(it.shape()),
+                                        it.rightLabel(),
+                                        listOf(it.color() to 1.0),
+                                    )
+                                }
+                            },
+                        )
+                        val right = BarFrame(
+                            headerPublisher = null.asOneTimePublisher(),
+                            subheadTextPublisher = candidates.subhead.merge(showTwoColumns) { sub, two -> if (two) null else sub },
+                            borderColorPublisher = Color.WHITE.asOneTimePublisher(),
+                            barsPublisher = candidates.list.merge(showTwoColumns) { cList, two ->
+                                val list = if (two) {
+                                    val mid = cList.size / 2
+                                    cList.drop(mid)
+                                } else {
+                                    emptyList()
+                                }
+                                list.map {
+                                    BarFrame.Bar.of(
+                                        it.leftLabel().withIcon(it.shape()),
+                                        it.rightLabel(),
+                                        listOf(it.color() to 1.0),
+                                    )
+                                }
+                            },
+                        )
+                        add(left)
+                        add(right)
+                        showTwoColumns.subscribe(
+                            Subscriber(
+                                eventQueueWrapper {
+                                    if (right.isVisible != it) {
+                                        if (it) add(right) else remove(right)
+                                    }
+                                    right.isVisible = it
+                                },
+                            ),
+                        )
+                    },
+                    BorderLayout.CENTER,
+                )
+            }
+            return object : GraphicsFrame(
+                headerPublisher = candidates.header,
+            ) {
+                init {
+                    addCenter(panel)
                 }
-            },
-            headerPublisher = candidates.header,
-            subheadTextPublisher = candidates.subhead,
-            maxPublisher = 1.0.asOneTimePublisher(),
-        )
+            }
+        }
 
         private fun <PT : CanOverrideSortOrder> createPrevPanel(
             prevVotes: Flow.Publisher<out Map<PT, Int>>,
