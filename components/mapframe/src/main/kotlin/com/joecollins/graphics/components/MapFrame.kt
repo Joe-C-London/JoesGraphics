@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Envelope
 import org.locationtech.jts.geom.Geometry
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.RenderingHints
@@ -44,60 +45,74 @@ class MapFrame(
     private val geometryToAwt: MutableMap<Geometry, Shape> = HashMap()
     private val transformedShapesCache: MutableMap<Shape, CompletableFuture<Shape>> = HashMap()
 
-    private fun createTransformedShape(transform: AffineTransform, shape: Shape): Shape {
-        val pathIterator = transform.createTransformedShape(shape).getPathIterator(null)
-        val currentPath = GeneralPath()
-        val c = DoubleArray(6)
-        var lastPoint: Point2D.Double? = null
-        val isOffScreen = { p: Point2D? ->
-            p != null && (p.x < 0 || p.y < 0 || p.x > width || p.y > height)
-        }
-        val distanceThreshold = { p1: Point2D, p2: Point2D ->
-            if (isOffScreen(p1) && isOffScreen(p2)) 10.0 else 0.5
-        }
-        while (!pathIterator.isDone) {
-            val type = pathIterator.currentSegment(c)
-            var nextPoint: Point2D.Double
-            when (type) {
-                PathIterator.SEG_MOVETO -> {
-                    lastPoint = Point2D.Double(c[0], c[1])
-                    currentPath.moveTo(c[0], c[1])
-                }
-
-                PathIterator.SEG_LINETO -> {
-                    nextPoint = Point2D.Double(c[0], c[1])
-                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(lastPoint, nextPoint)) {
-                        currentPath.lineTo(c[0], c[1])
-                        lastPoint = nextPoint
-                    }
-                }
-
-                PathIterator.SEG_QUADTO -> {
-                    nextPoint = Point2D.Double(c[2], c[3])
-                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(lastPoint, nextPoint)) {
-                        currentPath.quadTo(c[0], c[1], c[2], c[3])
-                        lastPoint = nextPoint
-                    }
-                }
-
-                PathIterator.SEG_CUBICTO -> {
-                    nextPoint = Point2D.Double(c[4], c[5])
-                    if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(lastPoint, nextPoint)) {
-                        currentPath.curveTo(c[0], c[1], c[2], c[3], c[4], c[5])
-                        lastPoint = nextPoint
-                    }
-                }
-
-                PathIterator.SEG_CLOSE -> {
-                    lastPoint = null
-                    currentPath.closePath()
-                }
-
-                else -> throw IllegalStateException("Unrecognised segment type $type")
+    companion object {
+        private fun createTransformedShape(transform: AffineTransform, shape: Shape, size: Dimension): Shape {
+            val pathIterator = transform.createTransformedShape(shape).getPathIterator(null)
+            val currentPath = GeneralPath()
+            val c = DoubleArray(6)
+            var lastPoint: Point2D.Double? = null
+            val isOffScreen = { p: Point2D? ->
+                p != null && (p.x < 0 || p.y < 0 || p.x > size.width || p.y > size.height)
             }
-            pathIterator.next()
+            val distanceThreshold = { p1: Point2D, p2: Point2D ->
+                if (isOffScreen(p1) && isOffScreen(p2)) 10.0 else 0.5
+            }
+            while (!pathIterator.isDone) {
+                val type = pathIterator.currentSegment(c)
+                var nextPoint: Point2D.Double
+                when (type) {
+                    PathIterator.SEG_MOVETO -> {
+                        lastPoint = Point2D.Double(c[0], c[1])
+                        currentPath.moveTo(c[0], c[1])
+                    }
+
+                    PathIterator.SEG_LINETO -> {
+                        nextPoint = Point2D.Double(c[0], c[1])
+                        if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(
+                                lastPoint,
+                                nextPoint,
+                            )
+                        ) {
+                            currentPath.lineTo(c[0], c[1])
+                            lastPoint = nextPoint
+                        }
+                    }
+
+                    PathIterator.SEG_QUADTO -> {
+                        nextPoint = Point2D.Double(c[2], c[3])
+                        if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(
+                                lastPoint,
+                                nextPoint,
+                            )
+                        ) {
+                            currentPath.quadTo(c[0], c[1], c[2], c[3])
+                            lastPoint = nextPoint
+                        }
+                    }
+
+                    PathIterator.SEG_CUBICTO -> {
+                        nextPoint = Point2D.Double(c[4], c[5])
+                        if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(
+                                lastPoint,
+                                nextPoint,
+                            )
+                        ) {
+                            currentPath.curveTo(c[0], c[1], c[2], c[3], c[4], c[5])
+                            lastPoint = nextPoint
+                        }
+                    }
+
+                    PathIterator.SEG_CLOSE -> {
+                        lastPoint = null
+                        currentPath.closePath()
+                    }
+
+                    else -> throw IllegalStateException("Unrecognised segment type $type")
+                }
+                pathIterator.next()
+            }
+            return currentPath
         }
-        return currentPath
     }
 
     internal val numShapes: Int
@@ -141,15 +156,16 @@ class MapFrame(
                 if (shapesToDraw.isEmpty()) {
                     return
                 }
+                val size = this.size
                 val bounds = focusBox!!
                 val transform = AffineTransform()
                 val boundsWidth = bounds.width
                 val boundsHeight = bounds.height
-                val xScale = (width - 4) / boundsWidth
-                val yScale = (height - 4) / boundsHeight
+                val xScale = (size.width - 4) / boundsWidth
+                val yScale = (size.height - 4) / boundsHeight
                 val scale = min(xScale, yScale)
-                val x = (width - scale * boundsWidth) / 2
-                val y = (height - scale * boundsHeight) / 2
+                val x = (size.width - scale * boundsWidth) / 2
+                val y = (size.height - scale * boundsHeight) / 2
                 transform.translate(x, y)
                 transform.scale(scale, scale)
                 // bounds is a native (y-up) Envelope; geometries render flipped via toAwtShape(),
@@ -157,7 +173,7 @@ class MapFrame(
                 transform.translate(-bounds.minX, bounds.maxY)
                 val inverted = transform.createInverse()
                 val drawArea = inverted.createTransformedShape(
-                    Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble()),
+                    Rectangle2D.Double(0.0, 0.0, size.width.toDouble(), size.height.toDouble()),
                 )
                 val inScope = { geom: Geometry -> drawArea.intersects(geom.awtBounds()) }
                 shapesToDraw
@@ -171,7 +187,7 @@ class MapFrame(
                             val awt = geometryToAwt.computeIfAbsent(geom) { it.toAwtShape() }
                             val transformedFuture = transformedShapesCache.computeIfAbsent(awt) { shape ->
                                 CompletableFuture.supplyAsync({
-                                    val s = createTransformedShape(transform, shape)
+                                    val s = createTransformedShape(transform, shape, size)
                                     repaint()
                                     s
                                 }, executor)
@@ -192,7 +208,7 @@ class MapFrame(
                         val awt = geometryToAwt.computeIfAbsent(geom) { it.toAwtShape() }
                         transformedShapesCache.computeIfAbsent(awt) { shape ->
                             CompletableFuture.supplyAsync({
-                                val s = createTransformedShape(transform, shape)
+                                val s = createTransformedShape(transform, shape, size)
                                 repaint()
                                 s
                             }, executor)
