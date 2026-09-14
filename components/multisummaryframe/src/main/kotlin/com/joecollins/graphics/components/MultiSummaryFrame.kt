@@ -106,7 +106,6 @@ class MultiSummaryFrame(
                         headerLabel.font = font
                         headerLabel.border = EmptyBorder(1, 0, 0, 0)
                         labels.forEach { label -> label.font = font }
-                        labels.forEach { label -> label.border = EmptyBorder(1, 0, 0, 0) }
                     }
                 },
             )
@@ -140,6 +139,7 @@ class MultiSummaryFrame(
                     val label = FontSizeAdjustingLabel()
                     label.font = entry.headerLabel.font
                     label.horizontalAlignment = JLabel.CENTER
+                    label.border = EmptyBorder(1, 0, 0, 0)
                     panel.layout = GridLayout(1, 1)
                     panel.add(label)
                     entry.panels.add(panel)
