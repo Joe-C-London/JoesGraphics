@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.joecollins.graphics.geometry.SafeGeometry
 import org.locationtech.jts.awt.ShapeReader
-import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.awt.geom.AffineTransform
 import java.awt.geom.Path2D
@@ -58,7 +58,7 @@ object HexJsonReader {
 
     private val geometryFactory = GeometryFactory()
 
-    fun readHex(file: URL): Map<String, Geometry> {
+    fun readHex(file: URL): Map<String, SafeGeometry> {
         val rootNode: HexJsonFile = objectMapper.readValue(file)
         return rootNode.hexes.mapValues { (_, hex) ->
             val shape = when (rootNode.layout) {
@@ -78,7 +78,7 @@ object HexJsonReader {
                     ).createTransformedShape(flatTop)
                 }
             }
-            ShapeReader.read(shape.getPathIterator(null), geometryFactory)
+            SafeGeometry(ShapeReader.read(shape.getPathIterator(null), geometryFactory))
         }
     }
 }

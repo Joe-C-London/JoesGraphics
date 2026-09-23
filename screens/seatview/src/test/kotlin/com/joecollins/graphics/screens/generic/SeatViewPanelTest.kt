@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.graphics.screens.generic.PartyMap.Companion.createPartyMap
 import com.joecollins.graphics.screens.generic.ResultMap.Companion.createResultMap
 import com.joecollins.graphics.screens.generic.SeatViewPanel.Companion.candidateDualSeats
@@ -20,8 +21,6 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.awt.Color
 import java.awt.Dimension
 import java.util.IdentityHashMap
@@ -3013,7 +3012,7 @@ class SeatViewPanelTest {
         )
     }
 
-    private fun peiShapesByRegion(): Map<String, Geometry> {
+    private fun peiShapesByRegion(): Map<String, SafeGeometry> {
         val keys = mapOf(
             "Cardigan" to setOf(4, 2, 5, 3, 7, 1, 6),
             "Malpeque" to setOf(19, 15, 16, 20, 17, 18, 8),
@@ -3022,7 +3021,7 @@ class SeatViewPanelTest {
         )
         val shapesByDistrict = peiShapesByDistrict()
         return keys.mapValues { e ->
-            OverlayNGRobust.union(e.value.map { shapesByDistrict[it]!! })
+            SafeGeometry.union(e.value.map { shapesByDistrict[it]!! })
         }
     }
 
@@ -3253,7 +3252,7 @@ class SeatViewPanelTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Geometry> {
+    private fun peiShapesByDistrict(): Map<Int, SafeGeometry> {
         val peiMap = SeatViewPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")

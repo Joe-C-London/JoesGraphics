@@ -2,7 +2,6 @@ package com.joecollins.graphics.utils
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.awt.ShapeWriter
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
@@ -41,10 +40,8 @@ class GeoJsonReaderTest {
         )
 
         val scaleFactor = 0.01
-        val shapeWriter = ShapeWriter()
-        val flip = AffineTransform.getScaleInstance(1.0, -1.0)
         val scaledShapes = shapes.mapValues { (_, geom) ->
-            val awt = flip.createTransformedShape(shapeWriter.toShape(geom))
+            val awt = geom.toAwtShape()
             AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor).createTransformedShape(awt)
         }
 

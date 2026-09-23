@@ -23,7 +23,8 @@ dependencies {
     implementation group: 'org.apache.xmlgraphics', name: 'batik-bridge', version: batikVersion
     api group: 'org.apache.xmlgraphics', name: 'batik-gvt', version: batikVersion
     implementation group: 'org.apache.xmlgraphics', name: 'batik-parser', version: batikVersion
-    api group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
+    api topLevel.project('jtsutils')
+    implementation group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
 
     testImplementation parent.project('testutils')
 

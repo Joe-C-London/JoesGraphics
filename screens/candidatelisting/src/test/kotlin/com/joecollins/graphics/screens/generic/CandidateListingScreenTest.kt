@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.graphics.screens.generic.SingleNoResultMap.Companion.createSingleNoResultMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
@@ -11,7 +12,6 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 import java.awt.Dimension
 
@@ -786,7 +786,7 @@ class CandidateListingScreenTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Geometry> {
+    private fun peiShapesByDistrict(): Map<Int, SafeGeometry> {
         val peiMap = CandidateListingScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")

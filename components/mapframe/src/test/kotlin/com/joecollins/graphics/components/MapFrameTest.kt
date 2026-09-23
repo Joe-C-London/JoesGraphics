@@ -1,14 +1,13 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.geometry.Bounds
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.geom.Envelope
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.awt.Color
 
 class MapFrameTest {
@@ -32,10 +31,8 @@ class MapFrameTest {
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
         )
         val bindingBox = shapes.asSequence()
-            .map { it.shape.envelopeInternal }
-            .reduce { acc, b ->
-                Envelope(acc).apply { expandToInclude(b) }
-            }
+            .map { it.shape.bounds }
+            .reduce { acc, b -> acc.expandToInclude(b) }
         assertEquals(bindingBox, mapFrame.focusBox)
     }
 
@@ -104,7 +101,7 @@ class MapFrameTest {
         val zoomBox = loadCityBox()
         val regions = shapes.map { it.shape }
         val header = Publisher("PEI")
-        val focusBox = Publisher<Envelope?>(null)
+        val focusBox = Publisher<Bounds?>(null)
         val mapFrame = MapFrame(
             headerPublisher = header,
             shapesPublisher = shapes.map { Pair(it.shape, it.color) }.asOneTimePublisher(),
@@ -120,13 +117,13 @@ class MapFrameTest {
 
     private fun loadShapes(colorFunc: (Int) -> Color): List<MapEntry> {
         val shapesByDistrict = shapesByDistrict()
-        return shapesByDistrict.map { (district: Int, shape: Geometry) ->
+        return shapesByDistrict.map { (district: Int, shape: SafeGeometry) ->
             val color = colorFunc(district)
             MapEntry(shape, color)
         }
     }
 
-    private fun loadRegions(): List<Geometry> {
+    private fun loadRegions(): List<SafeGeometry> {
         val shapesByDistrict = shapesByDistrict()
         return sequenceOf(
             (1..7).asSequence(),
@@ -134,7 +131,7 @@ class MapFrameTest {
             sequenceOf(8..8, 15..20).flatten(),
             (21..27).asSequence(),
         ).map { seq ->
-            OverlayNGRobust.union(seq.map { shapesByDistrict[it] }.toList())
+            SafeGeometry.union(seq.map { shapesByDistrict[it]!! }.toList())
         }.toList()
     }
 
@@ -145,16 +142,16 @@ class MapFrameTest {
         else -> Color.BLACK
     }
 
-    private fun loadCityBox(): Envelope = OverlayNGRobust.union(
+    private fun loadCityBox(): Bounds = SafeGeometry.union(
         shapesByDistrict().entries.filter { it.key in 10..14 }.map { it.value },
-    ).envelopeInternal
+    ).bounds
 
-    private fun shapesByDistrict(): Map<Int, Geometry> {
+    private fun shapesByDistrict(): Map<Int, SafeGeometry> {
         val peiMap = MapFrameTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
         return ShapefileReader.readShapes(peiMap, "DIST_NO", Int::class.java)
     }
 
-    private class MapEntry(val shape: Geometry, val color: Color)
+    private class MapEntry(val shape: SafeGeometry, val color: Color)
 }

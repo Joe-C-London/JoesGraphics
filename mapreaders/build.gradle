@@ -18,7 +18,8 @@ def topLevel = parent
 def geotoolsVersion = ext.geotoolsVersion
 
 dependencies {
-    api group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
+    api topLevel.project('jtsutils')
+    implementation group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
     implementation group: 'org.geotools', name: 'gt-main', version: geotoolsVersion
     implementation group: 'org.geotools', name: 'gt-metadata', version: geotoolsVersion
 }

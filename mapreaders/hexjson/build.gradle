@@ -15,7 +15,8 @@ def topLevel = parent.parent
 def jacksonVersion = '2.22.0'
 
 dependencies {
-    api group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
+    api topLevel.project('jtsutils')
+    implementation group: 'org.locationtech.jts', name: 'jts-core', version: topLevel.ext.jts_version
     implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"

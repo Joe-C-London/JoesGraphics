@@ -1,10 +1,10 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.geometry.Bounds
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.utils.ExecutorUtils
-import org.locationtech.jts.geom.Envelope
-import org.locationtech.jts.geom.Geometry
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Dimension
@@ -28,9 +28,9 @@ import kotlin.math.sqrt
 
 class MapFrame(
     headerPublisher: Flow.Publisher<out String?>,
-    shapesPublisher: Flow.Publisher<out List<Pair<Geometry, Color>>>,
-    focusBoxPublisher: Flow.Publisher<out Envelope?>? = null,
-    outlineShapesPublisher: Flow.Publisher<out List<Geometry>>? = null,
+    shapesPublisher: Flow.Publisher<out List<Pair<SafeGeometry, Color>>>,
+    focusBoxPublisher: Flow.Publisher<out Bounds?>? = null,
+    outlineShapesPublisher: Flow.Publisher<out List<SafeGeometry>>? = null,
     notesPublisher: Flow.Publisher<out String?>? = null,
     borderColorPublisher: Flow.Publisher<out Color>? = null,
 ) : GraphicsFrame(
@@ -39,10 +39,10 @@ class MapFrame(
     borderColorPublisher = borderColorPublisher,
 ) {
     private val executor = ExecutorUtils.createExecutor { Executors.newWorkStealingPool() }
-    private var shapesToDraw: List<Pair<Geometry, Color>> = ArrayList()
-    private var focus: Envelope? = null
-    private var outlineShapes: List<Geometry> = ArrayList()
-    private val geometryToAwt: MutableMap<Geometry, Shape> = HashMap()
+    private var shapesToDraw: List<Pair<SafeGeometry, Color>> = ArrayList()
+    private var focus: Bounds? = null
+    private var outlineShapes: List<SafeGeometry> = ArrayList()
+    private val geometryToAwt: MutableMap<SafeGeometry, Shape> = HashMap()
     private val transformedShapesCache: MutableMap<Shape, CompletableFuture<Shape>> = HashMap()
 
     companion object {
@@ -118,31 +118,19 @@ class MapFrame(
     internal val numShapes: Int
         get() = shapesToDraw.size
 
-    internal fun getShape(idx: Int): Geometry = shapesToDraw[idx].first
+    internal fun getShape(idx: Int): SafeGeometry = shapesToDraw[idx].first
 
     internal fun getColor(idx: Int): Color = shapesToDraw[idx].second
 
-    internal val focusBox: Envelope?
-        get() {
-            if (focus == null) {
-                var bounds: Envelope? = null
-                for (entry in shapesToDraw) {
-                    val e = entry.first.envelopeInternal
-                    if (bounds == null) {
-                        bounds = Envelope(e)
-                    } else {
-                        bounds.expandToInclude(e)
-                    }
-                }
-                return bounds
-            }
-            return focus
-        }
+    internal val focusBox: Bounds?
+        get() = focus ?: shapesToDraw
+            .map { it.first.bounds }
+            .reduceOrNull { acc, b -> acc.expandToInclude(b) }
 
     internal val numOutlineShapes: Int
         get() = outlineShapes.size
 
-    internal fun getOutlineShape(idx: Int): Geometry = outlineShapes[idx]
+    internal fun getOutlineShape(idx: Int): SafeGeometry = outlineShapes[idx]
 
     init {
         val panel: JPanel = object : JPanel() {
@@ -168,14 +156,14 @@ class MapFrame(
                 val y = (size.height - scale * boundsHeight) / 2
                 transform.translate(x, y)
                 transform.scale(scale, scale)
-                // bounds is a native (y-up) Envelope; geometries render flipped via toAwtShape(),
+                // bounds is a native (y-up) box; geometries render flipped via toAwtShape(),
                 // so the flipped y-range of [minY, maxY] is [-maxY, -minY] => translate by (-minX, maxY).
                 transform.translate(-bounds.minX, bounds.maxY)
                 val inverted = transform.createInverse()
                 val drawArea = inverted.createTransformedShape(
                     Rectangle2D.Double(0.0, 0.0, size.width.toDouble(), size.height.toDouble()),
                 )
-                val inScope = { geom: Geometry -> drawArea.intersects(geom.awtBounds()) }
+                val inScope = { geom: SafeGeometry -> drawArea.intersects(geom.awtBounds()) }
                 shapesToDraw
                     .asSequence()
                     .filter { inScope(it.first) }
@@ -236,7 +224,7 @@ class MapFrame(
         }
         addCenter(panel)
 
-        val onShapesUpdate: (List<Pair<Geometry, Color>>) -> Unit = { s ->
+        val onShapesUpdate: (List<Pair<SafeGeometry, Color>>) -> Unit = { s ->
             if (this.shapesToDraw != s) {
                 shapesToDraw = s
                 geometryToAwt.clear()
@@ -247,7 +235,7 @@ class MapFrame(
         }
         shapesPublisher.subscribe(Subscriber(eventQueueWrapper(onShapesUpdate)))
 
-        val onFocusBoxUpdate: (Envelope?) -> Unit = { focus ->
+        val onFocusBoxUpdate: (Bounds?) -> Unit = { focus ->
             if (this.focus != focus) {
                 this.focus = focus
                 transformedShapesCache.values.forEach { it.cancel(true) }
@@ -267,7 +255,7 @@ class MapFrame(
             onFocusBoxUpdate(null)
         }
 
-        val onOutlineShapesUpdate: (List<Geometry>) -> Unit = { s ->
+        val onOutlineShapesUpdate: (List<SafeGeometry>) -> Unit = { s ->
             outlineShapes = s
             geometryToAwt.clear()
             repaint()

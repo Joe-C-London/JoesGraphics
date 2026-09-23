@@ -1,10 +1,9 @@
 package com.joecollins.graphics.utils
 
+import com.joecollins.graphics.geometry.SafeGeometry
 import org.geotools.api.feature.simple.SimpleFeature
 import org.geotools.data.simple.SimpleFeatureIterator
 import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.geom.GeometryCollection
-import org.locationtech.jts.geom.Polygon
 import org.locationtech.jts.geom.util.GeometryFixer
 import org.locationtech.jts.operation.overlayng.OverlayNGRobust
 import java.net.URL
@@ -12,7 +11,7 @@ import kotlin.reflect.cast
 
 abstract class GenericReader {
 
-    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, Geometry> {
+    fun <T> readShapes(file: URL, keyProperty: String, keyType: Class<T>): Map<T, SafeGeometry> {
         if (keyType == Int::class.java) {
             return readShapes(file) { feature ->
                 @Suppress("UNCHECKED_CAST")
@@ -34,13 +33,13 @@ abstract class GenericReader {
         return readShapes(file) { feature -> keyType.cast(feature[keyProperty]) }
     }
 
-    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, Geometry> = readShapes(file, keyFunc) { true }
+    fun <T> readShapes(file: URL, keyFunc: (Map<String, Any>) -> T): Map<T, SafeGeometry> = readShapes(file, keyFunc) { true }
 
     fun <T> readShapes(
         file: URL,
         keyFunc: (Map<String, Any>) -> T,
         filter: (Map<String, Any>) -> Boolean,
-    ): Map<T, Geometry> {
+    ): Map<T, SafeGeometry> {
         val geometries: MutableMap<T, MutableList<Geometry>> = HashMap()
         var features: SimpleFeatureIterator? = null
         return try {
@@ -55,7 +54,7 @@ abstract class GenericReader {
                 val geom = feature.getAttribute(geometryKey) as Geometry
                 geometries.getOrPut(key) { mutableListOf() }.add(geom.let { if (it.isValid) it else GeometryFixer.fix(it) })
             }
-            geometries.mapValues { (_, geoms) -> OverlayNGRobust.union(geoms).also(this::warmEnvelopes) }
+            geometries.mapValues { (_, geoms) -> SafeGeometry(OverlayNGRobust.union(geoms)) }
         } finally {
             features?.close()
         }
@@ -87,31 +86,5 @@ abstract class GenericReader {
         override fun containsValue(value: Any): Boolean = values.contains(value)
 
         override fun containsKey(key: String): Boolean = keys.contains(key)
-    }
-
-    /**
-     * JTS computes [Geometry.getEnvelopeInternal] lazily into a non-volatile field, so the first
-     * caller unsafely publishes the [org.locationtech.jts.geom.Envelope]: a concurrent reader can see
-     * the reference before the coordinate writes and read the default 0.0s.  Since
-     * `Envelope.isNull()` is `maxx < minx`, an all-zero read is indistinguishable from a real box at
-     * the origin, and silently drags any envelope expanded to include it out to (0, 0).
-     *
-     * Forcing the computation here means every envelope is written on the loading thread, before the
-     * shapes are published, and is only ever read afterwards.
-     *
-     * The recursion is needed because computing a geometry's own envelope only warms the shell chain:
-     * a polygon defers to its exterior ring and a collection to its children, so interior rings would
-     * otherwise stay uninitialised.
-     */
-    private fun warmEnvelopes(geometry: Geometry) {
-        geometry.envelopeInternal
-        when (geometry) {
-            is Polygon -> {
-                warmEnvelopes(geometry.exteriorRing)
-                repeat(geometry.numInteriorRing) { warmEnvelopes(geometry.getInteriorRingN(it)) }
-            }
-
-            is GeometryCollection -> repeat(geometry.numGeometries) { warmEnvelopes(geometry.getGeometryN(it)) }
-        }
     }
 }

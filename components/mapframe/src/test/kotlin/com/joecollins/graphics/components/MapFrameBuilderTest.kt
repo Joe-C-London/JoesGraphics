@@ -1,5 +1,7 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.geometry.Bounds
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
@@ -7,21 +9,21 @@ import com.joecollins.pubsub.mapElements
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.locationtech.jts.geom.Coordinate
-import org.locationtech.jts.geom.Envelope
-import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.GeometryFactory
 import java.awt.Color
 
 class MapFrameBuilderTest {
     private val gf = GeometryFactory()
 
-    private fun rect(x: Double, y: Double, w: Double, h: Double): Geometry = gf.createPolygon(
-        arrayOf(
-            Coordinate(x, y),
-            Coordinate(x + w, y),
-            Coordinate(x + w, y + h),
-            Coordinate(x, y + h),
-            Coordinate(x, y),
+    private fun rect(x: Double, y: Double, w: Double, h: Double): SafeGeometry = SafeGeometry(
+        gf.createPolygon(
+            arrayOf(
+                Coordinate(x, y),
+                Coordinate(x + w, y),
+                Coordinate(x + w, y + h),
+                Coordinate(x, y + h),
+                Coordinate(x, y),
+            ),
         ),
     )
 
@@ -48,7 +50,7 @@ class MapFrameBuilderTest {
         assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
+        assertEquals(Bounds(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test
@@ -69,12 +71,12 @@ class MapFrameBuilderTest {
         assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
+        assertEquals(Bounds(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test
     fun testMapPropertyBinding() {
-        class ConstituencyPair(val shape: Geometry, val color: Color)
+        class ConstituencyPair(val shape: SafeGeometry, val color: Color)
 
         val red = redShape
         val blue = blueShape
@@ -94,7 +96,7 @@ class MapFrameBuilderTest {
         assertEquals(blue, frame.getShape(1))
         assertEquals(Color.BLUE, frame.getColor(1))
         assertEquals("MAP", frame.header)
-        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
+        assertEquals(Bounds(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test
@@ -141,7 +143,7 @@ class MapFrameBuilderTest {
             focus = focus,
         )
 
-        assertEquals(Envelope(2.0, 3.0, 2.0, 3.0), frame.focusBox)
+        assertEquals(Bounds(2.0, 3.0, 2.0, 3.0), frame.focusBox)
     }
 
     @Test
@@ -158,7 +160,7 @@ class MapFrameBuilderTest {
             header = "MAP".asOneTimePublisher(),
             focus = focus,
         )
-        assertEquals(Envelope(2.0, 7.0, 2.0, 7.0), frame.focusBox)
+        assertEquals(Bounds(2.0, 7.0, 2.0, 7.0), frame.focusBox)
     }
 
     @Test

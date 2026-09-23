@@ -1,22 +1,22 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.geometry.Bounds
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
-import org.locationtech.jts.geom.Envelope
-import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 import java.util.concurrent.Flow
 
 object MapFrameBuilder {
 
     fun from(
-        shapes: Flow.Publisher<out List<Pair<Geometry, Color>>>,
+        shapes: Flow.Publisher<out List<Pair<SafeGeometry, Color>>>,
         header: Flow.Publisher<out String?>,
-        focus: Flow.Publisher<out List<Geometry>?>? = null,
+        focus: Flow.Publisher<out List<SafeGeometry>?>? = null,
         notes: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
-        outline: Flow.Publisher<out List<Geometry>>? = null,
+        outline: Flow.Publisher<out List<SafeGeometry>>? = null,
     ): MapFrame = MapFrame(
         headerPublisher = header,
         shapesPublisher = shapes,
@@ -28,13 +28,13 @@ object MapFrameBuilder {
 
     fun <T> from(
         items: Flow.Publisher<out List<T>>,
-        shape: T.() -> Geometry,
+        shape: T.() -> SafeGeometry,
         color: T.() -> Flow.Publisher<out Color>,
         header: Flow.Publisher<out String?>,
         focus: Flow.Publisher<out List<T>?>? = null,
         notes: Flow.Publisher<out String?>? = null,
         borderColor: Flow.Publisher<out Color>? = null,
-        outline: Flow.Publisher<out List<Geometry>>? = null,
+        outline: Flow.Publisher<out List<SafeGeometry>>? = null,
     ): MapFrame = from(
         shapes = items.compose { list ->
             list.map { it.color().map { c -> Pair(it.shape(), c) } }.combine()
@@ -46,11 +46,9 @@ object MapFrameBuilder {
         outline = outline,
     )
 
-    // Combine (overlap) the envelopes of all the passed-in geometries into one Envelope.
-    private fun generateBounds(shapes: List<Geometry>?): Envelope? = shapes
+    // Combine (overlap) the bounding boxes of all the passed-in geometries into one box.
+    private fun generateBounds(shapes: List<SafeGeometry>?): Bounds? = shapes
         ?.asSequence()
-        ?.map { it.envelopeInternal }
-        ?.reduceOrNull { a, b ->
-            Envelope(a).apply { expandToInclude(b) }
-        }
+        ?.map { it.bounds }
+        ?.reduceOrNull { a, b -> a.expandToInclude(b) }
 }

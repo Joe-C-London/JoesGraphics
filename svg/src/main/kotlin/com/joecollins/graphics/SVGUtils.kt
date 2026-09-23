@@ -1,5 +1,6 @@
 package com.joecollins.graphics
 
+import com.joecollins.graphics.geometry.SafeGeometry
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory
 import org.apache.batik.bridge.BridgeContext
 import org.apache.batik.bridge.DocumentLoader
@@ -26,7 +27,7 @@ object SVGUtils {
         return handler.shape
     }
 
-    fun createGeometry(path: String): Geometry = GeometryFixer.fix(ShapeReader.read(createShape(path), 0.1, GeometryFactory()))
+    fun createGeometry(path: String): SafeGeometry = SafeGeometry(GeometryFixer.fix(ShapeReader.read(createShape(path), 0.1, GeometryFactory())))
 
     fun parseSvg(uri: URI): GraphicsNode {
         val svg = SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName()).createSVGDocument(uri.toString())

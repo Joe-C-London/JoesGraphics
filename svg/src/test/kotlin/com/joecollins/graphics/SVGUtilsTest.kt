@@ -2,7 +2,6 @@ package com.joecollins.graphics
 
 import com.joecollins.graphics.utils.RenderTestUtils
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.awt.ShapeWriter
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
@@ -74,9 +73,9 @@ class SVGUtilsTest {
                 g.fillRect(0, 0, width, height)
                 g.color = Color.RED
                 g.fill(
-                    shape.let(ShapeWriter()::toShape).let {
+                    shape.toAwtShape().let {
                         val scale = height / it.bounds2D.height
-                        AffineTransform.getScaleInstance(scale, -scale).createTransformedShape(it)
+                        AffineTransform.getScaleInstance(scale, scale).createTransformedShape(it)
                     }.let {
                         AffineTransform.getTranslateInstance(-it.bounds2D.x, -it.bounds2D.y).createTransformedShape(it)
                     },

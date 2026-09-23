@@ -1,0 +1,27 @@
+buildscript {
+    dependencies {
+        parent.buildscript.dependencies
+    }
+}
+plugins {
+    id 'kotlin'
+}
+
+group 'com.joecollins'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api group: 'org.locationtech.jts', name: 'jts-core', version: parent.ext.jts_version
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$parent.ext.junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$parent.ext.junit_version"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:$parent.ext.junit_platform_version"
+}
+
+test {
+    useJUnitPlatform()
+}

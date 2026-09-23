@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.graphics.screens.generic.SinglePartyMap.Companion.createSinglePartyMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
@@ -10,7 +11,6 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 import java.awt.Dimension
 
@@ -2029,7 +2029,7 @@ class SingleTransferrableResultScreenTest {
         )
     }
 
-    private fun niShapesByConstituency(): Map<Int, Geometry> {
+    private fun niShapesByConstituency(): Map<Int, SafeGeometry> {
         val niMap = SingleTransferrableResultScreenTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/ni-constituencies.shp")

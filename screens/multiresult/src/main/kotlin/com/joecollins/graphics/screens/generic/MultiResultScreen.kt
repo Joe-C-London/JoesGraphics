@@ -9,6 +9,7 @@ import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.MapFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.models.general.Aggregators
 import com.joecollins.models.general.CanOverrideSortOrder
@@ -22,7 +23,6 @@ import com.joecollins.pubsub.combine
 import com.joecollins.pubsub.compose
 import com.joecollins.pubsub.map
 import com.joecollins.pubsub.merge
-import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
@@ -627,7 +627,7 @@ class MultiResultScreen private constructor(
         }
 
         private val NULL_MAP: AbstractSingleResultMap<*, *> = createSingleResultMap {
-            shapes = emptyMap<Nothing?, Geometry>().asOneTimePublisher()
+            shapes = emptyMap<Nothing?, SafeGeometry>().asOneTimePublisher()
             leader = null.asOneTimePublisher()
             selectedShape = null.asOneTimePublisher()
             header = null.asOneTimePublisher()

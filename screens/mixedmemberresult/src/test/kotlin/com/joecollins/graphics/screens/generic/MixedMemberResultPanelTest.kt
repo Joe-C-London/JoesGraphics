@@ -1,5 +1,6 @@
 package com.joecollins.graphics.screens.generic
 
+import com.joecollins.graphics.geometry.SafeGeometry
 import com.joecollins.graphics.screens.generic.MixedMemberResultPanel.Companion.convertToPartyOrCandidateForMixedMember
 import com.joecollins.graphics.screens.generic.SingleResultMap.Companion.createSingleResultMap
 import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
@@ -15,7 +16,6 @@ import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
 import org.junit.jupiter.api.Test
-import org.locationtech.jts.geom.Geometry
 import java.awt.Color
 
 class MixedMemberResultPanelTest {
@@ -1754,7 +1754,7 @@ class MixedMemberResultPanelTest {
         )
     }
 
-    private fun peiShapesByDistrict(): Map<Int, Geometry> {
+    private fun peiShapesByDistrict(): Map<Int, SafeGeometry> {
         val peiMap = MixedMemberResultPanelTest::class.java
             .classLoader
             .getResource("com/joecollins/graphics/shapefiles/pei-districts.shp")
