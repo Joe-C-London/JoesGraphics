@@ -51,6 +51,7 @@ allprojects {
             ktlint()
                 .editorConfigOverride([
                     "max_line_length" : 2147483647,
+                    "ij_kotlin_line_break_after_multiline_when_entry": "false",
                 ])
         }
     }

@@ -366,11 +366,9 @@ class HemicycleFrame(
                 leftSize + midSize / 2 > width / 2 -> {
                     leftSize + midSize / 2
                 }
-
                 rightSize + midSize / 2 > width / 2 -> {
                     width - rightSize - midSize / 2
                 }
-
                 else -> {
                     width / 2
                 }

@@ -149,7 +149,6 @@ class MultiResultScreen private constructor(
                         candidate === others -> {
                             listOf("OTHERS")
                         }
-
                         else -> {
                             listOfNotNull(
                                 name(candidate).uppercase(),
@@ -161,11 +160,9 @@ class MultiResultScreen private constructor(
                         pct.isNaN() -> {
                             listOf("WAITING...")
                         }
-
                         pctOnly -> {
                             listOf(DecimalFormat("0.0%").format(pct))
                         }
-
                         else -> {
                             listOf(DecimalFormat("#,##0").format(votes.toLong()), DecimalFormat("0.0%").format(pct))
                         }

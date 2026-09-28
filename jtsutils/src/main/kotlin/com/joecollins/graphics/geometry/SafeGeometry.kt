@@ -120,9 +120,7 @@ class SafeGeometry(private val geometry: Geometry) {
                     exteriorRing.warmEnvelopes()
                     repeat(numInteriorRing) { getInteriorRingN(it).warmEnvelopes() }
                 }
-
                 is GeometryCollection -> repeat(numGeometries) { getGeometryN(it).warmEnvelopes() }
-
                 else -> Unit
             }
         }

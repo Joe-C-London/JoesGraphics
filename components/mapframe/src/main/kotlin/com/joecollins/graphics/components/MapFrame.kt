@@ -65,7 +65,6 @@ class MapFrame(
                         lastPoint = Point2D.Double(c[0], c[1])
                         currentPath.moveTo(c[0], c[1])
                     }
-
                     PathIterator.SEG_LINETO -> {
                         nextPoint = Point2D.Double(c[0], c[1])
                         if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(
@@ -77,7 +76,6 @@ class MapFrame(
                             lastPoint = nextPoint
                         }
                     }
-
                     PathIterator.SEG_QUADTO -> {
                         nextPoint = Point2D.Double(c[2], c[3])
                         if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(
@@ -89,7 +87,6 @@ class MapFrame(
                             lastPoint = nextPoint
                         }
                     }
-
                     PathIterator.SEG_CUBICTO -> {
                         nextPoint = Point2D.Double(c[4], c[5])
                         if (lastPoint == null || lastPoint.distance(nextPoint) > distanceThreshold(
@@ -101,12 +98,10 @@ class MapFrame(
                             lastPoint = nextPoint
                         }
                     }
-
                     PathIterator.SEG_CLOSE -> {
                         lastPoint = null
                         currentPath.closePath()
                     }
-
                     else -> throw IllegalStateException("Unrecognised segment type $type")
                 }
                 pathIterator.next()
