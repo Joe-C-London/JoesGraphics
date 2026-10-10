@@ -272,6 +272,15 @@ class PubSubTests {
     }
 
     @Test
+    fun testEmptyListCombiner() {
+        var output: List<Int>? = null
+        val publishers = emptyList<Publisher<Int>>()
+        val subscriber = Subscriber<List<Int>> { output = it }
+        publishers.combine().subscribe(subscriber)
+        assertEquals(emptyList<Int>(), output)
+    }
+
+    @Test
     fun testComposePublisher() {
         var output: Int? = null
         val innerPublisher1 = Publisher(7)

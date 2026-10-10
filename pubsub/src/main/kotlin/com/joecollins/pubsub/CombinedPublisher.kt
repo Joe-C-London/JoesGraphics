@@ -6,6 +6,13 @@ internal class CombinedPublisher<T>(
     private val publishers: List<Flow.Publisher<out T>>,
 ) : AbstractPublisher<List<T>>() {
 
+    init {
+        if (publishers.isEmpty()) {
+            submit(emptyList())
+            complete()
+        }
+    }
+
     private data class Wrapper<T>(var value: T)
 
     private lateinit var subscribers: List<Subscriber<T>>
@@ -14,6 +21,8 @@ internal class CombinedPublisher<T>(
     private val publishersCompleted = publishers.map { false }.toMutableList()
 
     override fun afterSubscribe() {
+        if (publishers.isEmpty()) return
+
         val me = this
         if (numSubscriptions == 1) {
             list = publishers.map { null }.toMutableList()
@@ -42,6 +51,8 @@ internal class CombinedPublisher<T>(
     }
 
     override fun afterUnsubscribe() {
+        if (publishers.isEmpty()) return
+
         if (numSubscriptions == 0) {
             subscribers.forEach { it.unsubscribe() }
         }
