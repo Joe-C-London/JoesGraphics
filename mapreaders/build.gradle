@@ -7,7 +7,7 @@ plugins {
     id 'kotlin'
 }
 ext {
-    geotoolsVersion = '35.0'
+    geotoolsVersion = '35.1'
 }
 
 group 'com.joecollins'

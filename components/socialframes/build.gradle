@@ -16,13 +16,12 @@ repositories {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 
 var topLevel = parent.parent
 
-def jacksonVersion = '2.22.0'
+def jacksonVersion = '2.22.3'
 
 dependencies {
     implementation topLevel.project('shapes')
@@ -39,7 +38,7 @@ dependencies {
     implementation group: 'io.webfolder', name: 'cdp4j', version: '3.0.15'
 
     testImplementation parent.parent.project('testutils')
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.23.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.24.0'
     testImplementation "org.junit.jupiter:junit-jupiter-api:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$topLevel.ext.junit_version"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher:$topLevel.ext.junit_platform_version"
