@@ -17,7 +17,7 @@ import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class SnakeyFrame private constructor(header: Flow.Publisher<String?>, panel: JPanel) : GraphicsFrame(header) {
+class SnakeyFrame private constructor(header: Flow.Publisher<out String?>, panel: JPanel) : GraphicsFrame(header) {
 
     init {
         addCenter(panel)
@@ -25,14 +25,14 @@ class SnakeyFrame private constructor(header: Flow.Publisher<String?>, panel: JP
 
     companion object {
         fun <L, R> create(
-            leftItems: Flow.Publisher<List<L>>,
-            rightItems: Flow.Publisher<List<R>>,
+            leftItems: Flow.Publisher<out List<L>>,
+            rightItems: Flow.Publisher<out List<R>>,
             transfers: Flow.Publisher<out Map<out Pair<L?, R?>, Int>>,
             leftLabel: L.() -> String,
             leftColor: L.() -> Color,
             rightLabel: R.() -> String,
             rightColor: R.() -> Color,
-            header: Flow.Publisher<String?>,
+            header: Flow.Publisher<out String?>,
         ): SnakeyFrame {
             val panel = SnakeyPanel<L, R>()
             leftItems.mapElements { SnakeyPanel.Item(it, it.leftLabel(), it.leftColor()) }
