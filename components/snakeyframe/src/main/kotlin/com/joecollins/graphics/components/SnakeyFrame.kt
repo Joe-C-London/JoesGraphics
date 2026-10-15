@@ -4,6 +4,7 @@ import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
 import com.joecollins.pubsub.mapElements
+import com.joecollins.pubsub.merge
 import java.awt.Color
 import java.awt.GradientPaint
 import java.awt.Graphics
@@ -28,16 +29,18 @@ class SnakeyFrame private constructor(header: Flow.Publisher<out String?>, panel
             leftItems: Flow.Publisher<out List<L>>,
             rightItems: Flow.Publisher<out List<R>>,
             transfers: Flow.Publisher<out Map<out Pair<L?, R?>, Int>>,
-            leftLabel: L.() -> String,
+            leftLabel: L.(Int) -> String,
             leftColor: L.() -> Color,
-            rightLabel: R.() -> String,
+            rightLabel: R.(Int) -> String,
             rightColor: R.() -> Color,
             header: Flow.Publisher<out String?>,
         ): SnakeyFrame {
             val panel = SnakeyPanel<L, R>()
-            leftItems.mapElements { SnakeyPanel.Item(it, it.leftLabel(), it.leftColor()) }
+            leftItems.merge(transfers) { items, t -> items.map { i -> i to t.filterKeys { it.first == i }.values.sum() } }
+                .mapElements { (item, count) -> SnakeyPanel.Item(item, item.leftLabel(count), item.leftColor()) }
                 .subscribe(Subscriber(eventQueueWrapper { panel.left = it }))
-            rightItems.mapElements { SnakeyPanel.Item(it, it.rightLabel(), it.rightColor()) }
+            rightItems.merge(transfers) { items, t -> items.map { i -> i to t.filterKeys { it.second == i }.values.sum() } }
+                .mapElements { (item, count) -> SnakeyPanel.Item(item, item.rightLabel(count), item.rightColor()) }
                 .subscribe(Subscriber(eventQueueWrapper { panel.right = it }))
             transfers.subscribe(Subscriber(eventQueueWrapper { panel.transfers = it }))
             return SnakeyFrame(header, panel)
@@ -88,7 +91,7 @@ class SnakeyFrame private constructor(header: Flow.Publisher<out String?>, panel
                 .filterValues { it > 0 }
             val total = max(leftItemTotals.values.sum(), rightItemTotals.values.sum()).toDouble()
 
-            val height = this.height - 2 * GAP
+            val height = this.height - 2 * GAP - GAP * (max(leftItemTotals.size, rightItemTotals.size) - 1)
 
             val fontMetrics = g.getFontMetrics(FONT)
             val left = 2 * GAP + (leftItemTotals.keys.maxOfOrNull { fontMetrics.stringWidth(it.label) } ?: 0) + BAR_WIDTH
@@ -101,7 +104,7 @@ class SnakeyFrame private constructor(header: Flow.Publisher<out String?>, panel
                     val h = height * size / total
                     g.fill(Rectangle2D.Double(left.toDouble() - BAR_WIDTH, totalHeight, BAR_WIDTH.toDouble(), h))
                     g.drawString(item.label, left - BAR_WIDTH - GAP - fontMetrics.stringWidth(item.label), (totalHeight + (h + fontMetrics.ascent - fontMetrics.descent) / 2).roundToInt())
-                    totalHeight += h
+                    totalHeight += (h + GAP)
                 }
             }
 
@@ -115,7 +118,7 @@ class SnakeyFrame private constructor(header: Flow.Publisher<out String?>, panel
                     val h = height * size / total
                     g.fill(Rectangle2D.Double(right.toDouble(), totalHeight, BAR_WIDTH.toDouble(), h))
                     g.drawString(item.label, right + BAR_WIDTH + GAP, (totalHeight + (h + fontMetrics.ascent - fontMetrics.descent) / 2).roundToInt())
-                    totalHeight += h
+                    totalHeight += (h + GAP)
                 }
             }
 
@@ -132,10 +135,10 @@ class SnakeyFrame private constructor(header: Flow.Publisher<out String?>, panel
                     g.paint = GradientPaint(
                         left.toFloat(),
                         0f,
-                        rightItem.color.run { Color(red, green, blue, 64) },
+                        leftItem.color.run { Color(red, green, blue, 64) },
                         right.toFloat(),
                         0f,
-                        leftItem.color.run { Color(red, green, blue, 64) },
+                        rightItem.color.run { Color(red, green, blue, 64) },
                     )
                     g.fill(
                         Path2D.Double().apply {

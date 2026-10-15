@@ -37,9 +37,9 @@ class SnakeyScreen private constructor(frame: SnakeyFrame, title: Flow.Publisher
                 rightItems = rightItems,
                 transfers = transfers,
                 header = header,
-                leftLabel = { abbreviation },
+                leftLabel = { count -> "$abbreviation: $count" },
                 leftColor = { color },
-                rightLabel = { abbreviation },
+                rightLabel = { count -> "$abbreviation: $count" },
                 rightColor = { color },
             )
             val altText = leftItems.merge(rightItems) { l, r -> l to r }.merge(transfers) { (left, right), t ->

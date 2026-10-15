@@ -37,9 +37,9 @@ class SnakeyFrameTest {
             parties1988.asOneTimePublisher(),
             parties1993.asOneTimePublisher(),
             transfers.asOneTimePublisher(),
-            { first },
+            { count -> "$first: $count" },
             { second },
-            { first },
+            { count -> "$first: $count" },
             { second },
             "SEAT CHANGES".asOneTimePublisher(),
         )
@@ -70,9 +70,9 @@ class SnakeyFrameTest {
             parties1988,
             parties1993,
             transfers,
-            { first },
+            { count -> "$first: $count" },
             { second },
-            { first },
+            { count -> "$first: $count" },
             { second },
             "SEAT CHANGES".asOneTimePublisher(),
         )
