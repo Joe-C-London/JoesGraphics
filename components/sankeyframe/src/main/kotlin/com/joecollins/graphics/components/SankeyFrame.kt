@@ -1,5 +1,6 @@
 package com.joecollins.graphics.components
 
+import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.pubsub.Subscriber
 import com.joecollins.pubsub.Subscriber.Companion.eventQueueWrapper
@@ -102,6 +103,7 @@ class SankeyFrame private constructor(header: Flow.Publisher<out String?>, panel
                     g.color = item.color
                     val h = height * size / total
                     g.fill(Rectangle2D.Double(left.toDouble() - BAR_WIDTH, totalHeight, BAR_WIDTH.toDouble(), h))
+                    g.color = ColorUtils.contrastForBackground(item.color)
                     g.drawString(item.label, left - BAR_WIDTH - GAP - fontMetrics.stringWidth(item.label), (totalHeight + (h + fontMetrics.ascent - fontMetrics.descent) / 2).roundToInt())
                     totalHeight += (h + GAP)
                 }
@@ -116,6 +118,7 @@ class SankeyFrame private constructor(header: Flow.Publisher<out String?>, panel
                     g.color = item.color
                     val h = height * size / total
                     g.fill(Rectangle2D.Double(right.toDouble(), totalHeight, BAR_WIDTH.toDouble(), h))
+                    g.color = ColorUtils.contrastForBackground(item.color)
                     g.drawString(item.label, right + BAR_WIDTH + GAP, (totalHeight + (h + fontMetrics.ascent - fontMetrics.descent) / 2).roundToInt())
                     totalHeight += (h + GAP)
                 }
