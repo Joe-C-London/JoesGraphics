@@ -2,9 +2,11 @@ package com.joecollins.graphics.screens.generic
 
 import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.BarFrame
+import com.joecollins.graphics.components.BarFrameBuilder
 import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.components.SwingFrame
 import com.joecollins.graphics.components.SwingFrameBuilder
+import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCoalition
 import com.joecollins.pubsub.asOneTimePublisher
 import com.joecollins.pubsub.map
@@ -37,6 +39,7 @@ class PartyQuotasPanel private constructor(
 ) {
 
     companion object {
+        @JvmName("partyQuotasSwing")
         fun <P : PartyOrCoalition> partyQuotas(
             curr: Curr.() -> Unit,
             change: (Change.() -> Unit)? = null,
@@ -54,7 +57,29 @@ class PartyQuotasPanel private constructor(
                 createDiffFrame(currProps, changeProps),
                 createSwingFrame(swingProps),
                 map?.mapFrame,
-                createAltText(currProps, changeProps, swingProps, title),
+                createAltText(currProps, changeProps, swingProps, null, title),
+            )
+        }
+
+        @JvmName("partyQuotasPrev")
+        fun <P : PartyOrCoalition> partyQuotas(
+            curr: Curr.() -> Unit,
+            change: (Change.() -> Unit)? = null,
+            prevResults: (PrevResults.() -> Unit),
+            map: AbstractMap<*>? = null,
+            title: Flow.Publisher<out String>,
+        ): PartyQuotasPanel {
+            val currProps = Curr().apply(curr)
+            val changeProps = change?.let { Change().apply(it) }
+            val prevProps = prevResults.let { PrevResults().apply(it) }
+            return PartyQuotasPanel(
+                title,
+                createFrame(currProps),
+                null,
+                createDiffFrame(currProps, changeProps),
+                createPrevFrame(prevProps),
+                map?.mapFrame,
+                createAltText(currProps, changeProps, null, prevProps, title),
             )
         }
 
@@ -118,10 +143,32 @@ class PartyQuotasPanel private constructor(
             )
         }
 
+        private fun createPrevFrame(prevResults: PrevResults?): JPanel? {
+            if (prevResults == null) {
+                return null
+            }
+            return BarFrameBuilder.basic(
+                barsPublisher = prevResults.seats.map { prev ->
+                    prev.entries
+                        .sortedByDescending { it.value }
+                        .map {
+                            BarFrameBuilder.BasicBar.of(
+                                label = it.key.abbreviation.uppercase(),
+                                color = it.key.color,
+                                value = it.value,
+                            )
+                        }
+                },
+                maxPublisher = prevResults.seats.map { prev -> prev.values.sum() / 2 },
+                headerPublisher = prevResults.header,
+            )
+        }
+
         private fun createAltText(
             curr: Curr,
             change: Change?,
             swing: Swing?,
+            prev: PrevResults?,
             title: Flow.Publisher<out String?>,
         ): Flow.Publisher<(Int) -> String> {
             val combineHeaderAndSubhead: (String?, String?) -> String? = { h, s ->
@@ -192,8 +239,12 @@ class PartyQuotasPanel private constructor(
                         }
                     }
             }
+            val prevText = prev?.header?.merge(prev.seats) { h, s ->
+                (listOf(h) + s.entries.sortedByDescending { it.value }.map { "${it.key.abbreviation}: ${it.value}" })
+                    .joinToString("\n")
+            }
             return title.merge(mainText) { h, m -> "$h\n\n$m" }
-                .merge(swingText ?: null.asOneTimePublisher()) { h, s ->
+                .merge(swingText ?: prevText ?: null.asOneTimePublisher()) { h, s ->
                     if (s == null) {
                         h
                     } else {
@@ -223,5 +274,10 @@ class PartyQuotasPanel private constructor(
         lateinit var order: List<PartyOrCoalition>
         lateinit var header: Flow.Publisher<out String?>
         var range: Flow.Publisher<Double>? = null
+    }
+
+    class PrevResults internal constructor() {
+        lateinit var seats: Flow.Publisher<out Map<Party, Int>>
+        lateinit var header: Flow.Publisher<out String?>
     }
 }
