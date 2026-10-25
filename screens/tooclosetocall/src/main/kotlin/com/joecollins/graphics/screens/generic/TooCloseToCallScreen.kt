@@ -66,6 +66,11 @@ class TooCloseToCallScreen private constructor(
                 field = value
                 update()
             }
+        var reversed = false
+            set(value) {
+                field = value
+                update()
+            }
 
         private val entriesPublisher = Publisher(calculateEntries())
         fun toEntries() = entriesPublisher
@@ -84,7 +89,7 @@ class TooCloseToCallScreen private constructor(
             }
             .filter { showZeroes || it.votes.values.sum() > 0 }
             .filter { it.declared != true }
-            .sortedBy { sortOrder.sortOrder(it).toDouble() }
+            .sortedBy { sortOrder.sortOrder(it).toDouble() * (if (reversed) -1 else 1) }
             .take(maxRows)
             .toList()
     }
@@ -139,7 +144,7 @@ class TooCloseToCallScreen private constructor(
         )
 
         fun <T, CT> of(
-            entries: Flow.Publisher<Set<T>>,
+            entries: Flow.Publisher<Collection<T>>,
             votes: Vote<T, CT>,
             result: T.() -> Flow.Publisher<out ElectionResult<*>?>,
             reporting: ReportingString<T>? = null,
@@ -151,6 +156,7 @@ class TooCloseToCallScreen private constructor(
             title: Flow.Publisher<out String?>,
             showLead: Boolean = true,
             showZeroes: Boolean = false,
+            reversed: Boolean = false,
         ): TooCloseToCallScreen {
             val input = Input<T, CT>()
             entries.compose { set -> Aggregators.toMap(set) { votes.votes(it) } }.subscribe(Subscriber { input.votes = it })
@@ -161,6 +167,7 @@ class TooCloseToCallScreen private constructor(
             numCandidates?.subscribe(Subscriber { input.numCandidates = it })
             input.sortOrder = sortOrder
             input.showZeroes = showZeroes
+            input.reversed = reversed
             return TooCloseToCallScreen(
                 title,
                 createFrame(header, input, votes, reporting, showLead),
@@ -263,15 +270,15 @@ class TooCloseToCallScreen private constructor(
     }
 
     sealed class ReportingString<T> {
-        internal abstract fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>>
+        internal abstract fun reporting(entries: Flow.Publisher<out Collection<T>>): Flow.Publisher<out Map<T, String>>
     }
 
     class PctReportingString<T>(private val pctReporting: T.() -> Flow.Publisher<Double>) : ReportingString<T>() {
-        override fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>> = entries.compose { e -> Aggregators.toMap(e) { it.pctReporting().map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
+        override fun reporting(entries: Flow.Publisher<out Collection<T>>): Flow.Publisher<out Map<T, String>> = entries.compose { e -> Aggregators.toMap(e) { it.pctReporting().map { pct -> DecimalFormat("0.0%").format(pct) + " IN" } } }
     }
 
     class PollsReportingString<T>(private val pollsReporting: T.() -> Flow.Publisher<PollsReporting>) : ReportingString<T>() {
-        override fun reporting(entries: Flow.Publisher<out Set<T>>): Flow.Publisher<out Map<T, String>> = entries.compose { e -> Aggregators.toMap(e) { it.pollsReporting().map { (reporting, total) -> "$reporting/$total" } } }
+        override fun reporting(entries: Flow.Publisher<out Collection<T>>): Flow.Publisher<out Map<T, String>> = entries.compose { e -> Aggregators.toMap(e) { it.pollsReporting().map { (reporting, total) -> "$reporting/$total" } } }
     }
 
     enum class SortOrder(
