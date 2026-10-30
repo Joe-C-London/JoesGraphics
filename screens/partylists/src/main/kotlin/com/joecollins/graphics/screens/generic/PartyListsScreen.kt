@@ -4,6 +4,7 @@ import com.joecollins.graphics.GenericPanel
 import com.joecollins.graphics.components.ResultListingFrame
 import com.joecollins.graphics.utils.ColorUtils
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.Party
 import com.joecollins.models.general.PartyOrCandidate
 import com.joecollins.pubsub.Publisher
 import com.joecollins.pubsub.Subscriber
@@ -27,8 +28,29 @@ class PartyListsScreen private constructor(title: Flow.Publisher<out String?>, f
             skipCandidates: Flow.Publisher<out Collection<Candidate>>? = null,
             numRows: Flow.Publisher<Int>? = null,
             title: Flow.Publisher<String>,
+        ): PartyListsScreen = create(lists, showOrder, numSeats, skipCandidates, numRows, title, PartyOrCandidate::name, PartyOrCandidate::color)
+
+        @JvmName("ofParty")
+        fun of(
+            lists: Flow.Publisher<Map<Party, List<Candidate>>>,
+            showOrder: Flow.Publisher<List<Party>>,
+            numSeats: Flow.Publisher<Map<Party, Int>>,
+            skipCandidates: Flow.Publisher<out Collection<Candidate>>? = null,
+            numRows: Flow.Publisher<Int>? = null,
+            title: Flow.Publisher<String>,
+        ): PartyListsScreen = create(lists, showOrder, numSeats, skipCandidates, numRows, title, Party::name, Party::color)
+
+        private fun <P> create(
+            lists: Flow.Publisher<Map<P, List<Candidate>>>,
+            showOrder: Flow.Publisher<List<P>>,
+            numSeats: Flow.Publisher<Map<P, Int>>,
+            skipCandidates: Flow.Publisher<out Collection<Candidate>>?,
+            numRows: Flow.Publisher<Int>?,
+            title: Flow.Publisher<String>,
+            name: P.() -> String,
+            color: P.() -> Color,
         ): PartyListsScreen {
-            val inputs = Inputs()
+            val inputs = Inputs(name)
             lists.subscribe(Subscriber(inputs::setLists))
             showOrder.subscribe(Subscriber(inputs::setShowOrder))
             numSeats.subscribe(Subscriber(inputs::setNumSeats))
@@ -45,10 +67,10 @@ class PartyListsScreen private constructor(title: Flow.Publisher<out String?>, f
                                 val index = components.size
                                 add(
                                     ResultListingFrame(
-                                        headerPublisher = result[index].party.map { it.name.uppercase() },
+                                        headerPublisher = result[index].party.map { name(it).uppercase() },
                                         numRowsPublisher = numRows ?: 15.asOneTimePublisher(),
                                         itemsPublisher = result[index].items,
-                                        borderColorPublisher = result[index].party.map { it.color },
+                                        borderColorPublisher = result[index].party.map { color(it) },
                                         shrinkToFit = true,
                                     ),
                                 )
@@ -64,27 +86,27 @@ class PartyListsScreen private constructor(title: Flow.Publisher<out String?>, f
         }
     }
 
-    private class Inputs {
-        private var lists: Map<PartyOrCandidate, List<Candidate>> = emptyMap()
-        private var showOrder: List<PartyOrCandidate> = emptyList()
-        private var numSeats: Map<PartyOrCandidate, Int> = emptyMap()
+    private class Inputs<P>(private val name: P.() -> String) {
+        private var lists: Map<P, List<Candidate>> = emptyMap()
+        private var showOrder: List<P> = emptyList()
+        private var numSeats: Map<P, Int> = emptyMap()
         private var skipCandidates: Collection<Candidate> = emptyList()
 
-        fun setLists(lists: Map<PartyOrCandidate, List<Candidate>>) {
+        fun setLists(lists: Map<P, List<Candidate>>) {
             synchronized(this) {
                 this.lists = lists
                 publishResult()
             }
         }
 
-        fun setShowOrder(showOrder: List<PartyOrCandidate>) {
+        fun setShowOrder(showOrder: List<P>) {
             synchronized(this) {
                 this.showOrder = showOrder
                 publishResult()
             }
         }
 
-        fun setNumSeats(numSeats: Map<PartyOrCandidate, Int>) {
+        fun setNumSeats(numSeats: Map<P, Int>) {
             synchronized(this) {
                 this.numSeats = numSeats
                 publishResult()
@@ -98,13 +120,13 @@ class PartyListsScreen private constructor(title: Flow.Publisher<out String?>, f
             }
         }
 
-        class FrameInput {
-            val party = Publisher<PartyOrCandidate>()
+        class FrameInput<P> {
+            val party = Publisher<P>()
             val items = Publisher<List<ResultListingFrame.Item>>()
         }
 
-        private val frameInputs = ArrayList<FrameInput>()
-        val result = Publisher<List<FrameInput>>(emptyList())
+        private val frameInputs = ArrayList<FrameInput<P>>()
+        val result = Publisher<List<FrameInput<P>>>(emptyList())
         val altText = Publisher("")
         private fun publishResult() {
             val anySeats = numSeats.values.sum() > 0
@@ -154,9 +176,9 @@ class PartyListsScreen private constructor(title: Flow.Publisher<out String?>, f
                     val skipped = names.count { skipCandidates.contains(it) }
                     if (anySeats) {
                         val seats = numSeats[poc] ?: 0
-                        "${poc.name.uppercase()}: $seats OF ${names.size} ELECTED"
+                        "${name(poc).uppercase()}: $seats OF ${names.size} ELECTED"
                     } else {
-                        "${poc.name.uppercase()}: ${names.size} NAME${if (names.size == 1) "" else "S"}"
+                        "${name(poc).uppercase()}: ${names.size} NAME${if (names.size == 1) "" else "S"}"
                     } + if (skipped == 0) "" else ", $skipped SKIPPED"
                 },
             )

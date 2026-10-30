@@ -179,4 +179,72 @@ class PartyListsScreenTest {
             """.trimIndent(),
         )
     }
+
+    @Test
+    fun testPartyListsAsParties() {
+        val awp = Party("Animal Welfare Party", "AWP", Color.PINK.darker())
+        val brex = Party("Brexit", "BREX", Color.CYAN.darker())
+        val change = Party("Change UK", "CUK", Color.BLACK)
+        val con = Party("Conservative", "CON", Color.BLUE)
+        val green = Party("Green", "GREEN", Color.GREEN.darker())
+        val lab = Party("Labour", "LAB", Color.RED)
+        val libdem = Party("Liberal Democrats", "LIBDEM", Color.ORANGE)
+        val ukeu = Party("UK European Union", "UKEU", Color.BLUE.darker())
+        val ukip = Party("UK Independence Party", "UKIP", Color.MAGENTA.darker())
+        val wep = Party("Women's Equality Party", "WEP", Color.MAGENTA.darker().darker())
+
+        val lists = mapOf(
+            awp to listOf("Vanessa Hudson", "Jane Smith", "Sam Morland", "Ranjan Joshi", "Mina Da Rui", "Jonathan Horrian", "Simon Gouldman"),
+            brex to listOf("Benyamin Habib", "Lance Graham Forman", "Graham Shore", "Alka Cuthbert", "Jimi Ogunnusi", "Simon Marcus", "Mehrtash A'zami", "Aileen Quinton"),
+            con to listOf("Syed Kamall", "Charles Tannock", "Joy Morrisey", "Tim Barnes", "Scott Pattenden", "Attick Rahman", "Kirsty Finlayson", "Luke Parker"),
+            change to listOf("Gavin Esler", "Jacek Rostowski", "Carole Tongue", "Annabel Mullin", "Karen Newman", "Nora Mulready", "Jessica Simor", "Haseeb Ur-Rehman"),
+            green to listOf("Scott Ainslie", "Gulnar Hasnain", "Shahrar Ali", "Rachel Collinson", "Eleanor Margolies", "Remco von der Stoep", "Kirsten De Keyser", "Peter Underwood"),
+            lab to listOf("Claude Moraes", "Seb Dance", "Katy Clark", "Laura Parker", "Murad Qureshi", "Taranjit Kaur Chana", "James Beckles", "Sanchia Alasia"),
+            libdem to listOf("Irina Von Wiese", "Dinesh Dhamija", "Luisa Manon Porritt", "Jonathan Fryer", "Hussain Khan", "Helen Cross", "Graham Colley", "Rabina Khan"),
+            ukeu to listOf("Pierre Kirk", "Richard Stevens", "Saleyha Ahsan", "Anna Novikova", "Angela Antetomaso", "Richard Boardman"),
+            ukip to listOf("Gerard Batten", "Richard Braine", "Peter Muswell", "Fredda Vachha", "Robert Stephenson", "Peter McIlvenna", "John Poynton", "Ronie Johnson"),
+            wep to listOf("Catherine Mayer", "Bea Gare", "Nanci Hogan", "Aliyah Dunbar-Hussain", "Hannah Barham-Brown", "Alison Marshall", "Olivia Vincenti", "Leyla Mohan"),
+        ).mapValues { (p, c) -> c.map { Candidate(it, p) } }
+
+        val showOrder = Publisher(listOf(brex, con, change, green, lab, libdem))
+
+        val numSeats = Publisher(emptyMap<Party, Int>())
+
+        val panel = PartyListsScreen.of(
+            lists = lists.asOneTimePublisher(),
+            showOrder = showOrder,
+            numSeats = numSeats,
+            title = "LONDON".asOneTimePublisher(),
+        )
+        panel.setSize(1024, 512)
+        compareRendering("PartyListsScreen", "Basic-1", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            LONDON
+            
+            BREXIT: 8 NAMES
+            CONSERVATIVE: 8 NAMES
+            CHANGE UK: 8 NAMES
+            GREEN: 8 NAMES
+            LABOUR: 8 NAMES
+            LIBERAL DEMOCRATS: 8 NAMES
+            """.trimIndent(),
+        )
+
+        numSeats.submit(mapOf(libdem to 3, lab to 2, brex to 2, green to 1))
+        showOrder.submit(listOf(libdem, lab, brex, green))
+        compareRendering("PartyListsScreen", "Basic-2", panel)
+        assertPublishes(
+            panel.altText.map { it(1000) },
+            """
+            LONDON
+            
+            LIBERAL DEMOCRATS: 3 OF 8 ELECTED
+            LABOUR: 2 OF 8 ELECTED
+            BREXIT: 2 OF 8 ELECTED
+            GREEN: 1 OF 8 ELECTED
+            """.trimIndent(),
+        )
+    }
 }
