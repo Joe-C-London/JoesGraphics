@@ -10,6 +10,7 @@ import com.joecollins.graphics.components.GraphicsFrame
 import com.joecollins.graphics.utils.StandardFont
 import com.joecollins.models.general.CanOverrideSortOrder
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Subscriber
@@ -81,6 +82,60 @@ class CandidateListingScreen private constructor(
                     { party.color },
                     combinedFunc,
                     { if (incumbentMarker != null && incumbent) ImageGenerator.createFilledBoxedTextShape(incumbentMarker) else null },
+                ),
+                prevPanel?.run {
+                    createPrevPanel(
+                        votes,
+                        header,
+                        subheadOrDefault,
+                        { abbreviation },
+                        { color },
+                    )
+                },
+                secondaryPrevPanel?.run {
+                    createPrevPanel(
+                        votes,
+                        header,
+                        subheadOrDefault,
+                        { abbreviation },
+                        { color },
+                    )
+                },
+                map?.mapFrame,
+                createAltText(
+                    title,
+                    candidatesPanel,
+                    prevPanel,
+                    secondaryPrevPanel,
+                    { abbreviation },
+                    combinedFunc,
+                ),
+            )
+        }
+
+        fun of(
+            candidates: CandidatesPanel<Candidate>.() -> Unit,
+            prev: (PrevPanel<Party>.() -> Unit)? = null,
+            secondaryPrev: (PrevPanel<Party>.() -> Unit)? = null,
+            map: SingleNoResultMap<*>? = null,
+            incumbentMarkerByType: (IncumbencyType) -> String?,
+            showTwoColumns: Flow.Publisher<Boolean>? = null,
+            title: Flow.Publisher<out String?>,
+        ): CandidateListingScreen {
+            val candidatesPanel = CandidatesPanel<Candidate>().apply(candidates)
+            val prevPanel = prev?.let { PrevPanel<Party>().apply(it) }
+            val secondaryPrevPanel = secondaryPrev?.let { PrevPanel<Party>().apply(it) }
+            val combinedFunc: Candidate.() -> String = { name.uppercase() + (if (incumbencyType != null && incumbentMarkerByType(incumbencyType!!) != null) " [${incumbentMarkerByType(incumbencyType!!)}]" else "") + " (${party.abbreviation})" }
+            return CandidateListingScreen(
+                title,
+                createCandidatesPanel(
+                    candidatesPanel,
+                    showTwoColumns,
+                    { name.uppercase() },
+                    { party.name.uppercase() },
+                    { party.color },
+                    combinedFunc,
+                    { if (incumbencyType != null && incumbentMarkerByType(incumbencyType!!) != null) ImageGenerator.createFilledBoxedTextShape(incumbentMarkerByType(incumbencyType!!)!!) else null },
                 ),
                 prevPanel?.run {
                     createPrevPanel(

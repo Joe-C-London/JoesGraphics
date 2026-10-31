@@ -6,6 +6,7 @@ import com.joecollins.graphics.utils.PublisherTestUtils.assertPublishes
 import com.joecollins.graphics.utils.RenderTestUtils.compareRendering
 import com.joecollins.graphics.utils.ShapefileReader
 import com.joecollins.models.general.Candidate
+import com.joecollins.models.general.IncumbencyType
 import com.joecollins.models.general.NonPartisanCandidate
 import com.joecollins.models.general.Party
 import com.joecollins.pubsub.Publisher
@@ -782,6 +783,40 @@ class CandidateListingScreenTest {
             
             2017 RESULT
             KAMINGOAK: UNCONTESTED
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun testCandidatesDifferentIncumbentTypes() {
+        val lib = Party("Liberal", "LIB", Color.RED)
+        val grn = Party("Green", "GRN", Color.GREEN.darker())
+        val pc = Party("Progressive Conservative", "PC", Color.BLUE)
+        val candidates = listOf(
+            Candidate("Tommy Kickham", lib),
+            Candidate("Colin LaVie", pc, IncumbencyType.DEFAULT),
+            Candidate("Boyd Leard", grn, IncumbencyType.LIST),
+        )
+        val screen = CandidateListingScreen.of(
+            candidates = {
+                list = candidates.asOneTimePublisher()
+                header = "CANDIDATES".asOneTimePublisher()
+                subhead = "".asOneTimePublisher()
+            },
+            incumbentMarkerByType = { if (it == IncumbencyType.DEFAULT) "RIDING MLA" else "LIST MLA" },
+            title = "SOURIS-ELMIRA".asOneTimePublisher(),
+        )
+        screen.size = Dimension(1024, 512)
+        compareRendering("CandidateListingScreen", "CandidatesMultipleTypes", screen)
+        assertPublishes(
+            screen.altText.map { it(1000) },
+            """
+            SOURIS-ELMIRA
+            
+            CANDIDATES
+            TOMMY KICKHAM (LIB)
+            COLIN LAVIE [RIDING MLA] (PC)
+            BOYD LEARD [LIST MLA] (GRN)
             """.trimIndent(),
         )
     }
