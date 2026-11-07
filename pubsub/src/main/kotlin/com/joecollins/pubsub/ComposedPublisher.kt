@@ -9,6 +9,7 @@ internal class ComposedPublisher<T, R>(
 
     private lateinit var mainSubscriber: Subscriber<T>
     private var subSubscriber: Subscriber<R>? = null
+    private var subSubscriberId = 0
 
     private var topCompleted = false
     private var subCompleted = false
@@ -32,10 +33,11 @@ internal class ComposedPublisher<T, R>(
             synchronized(this) {
                 subSubscriber?.unsubscribe()
                 subCompleted = false
+                val sourceId = (++subSubscriberId)
                 subSubscriber = Subscriber({ r ->
-                    onSubUpdated(r)
+                    onSubUpdated(sourceId, r)
                 }, {
-                    onSubCompleted()
+                    onSubCompleted(sourceId)
                 }, {
                     error(it)
                 })
@@ -55,14 +57,16 @@ internal class ComposedPublisher<T, R>(
         }
     }
 
-    private fun onSubUpdated(r: R) {
+    private fun onSubUpdated(sourceId: Int, r: R) {
         synchronized(this) {
+            if (sourceId != this.subSubscriberId) return
             submit(r)
         }
     }
 
-    private fun onSubCompleted() {
+    private fun onSubCompleted(sourceId: Int) {
         synchronized(this) {
+            if (sourceId != this.subSubscriberId) return
             subCompleted = true
             if (topCompleted) {
                 complete()
