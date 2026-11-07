@@ -148,7 +148,7 @@ class PartyListsScreen private constructor(title: Flow.Publisher<out String?>, f
                                 c.name.uppercase(),
                                 if (elected.contains(c)) {
                                     ColorUtils.foregroundToContrast(c.party.color)
-                                } else if (anySeats || skipCandidates.contains(c)) {
+                                } else if (skipCandidates.contains(c)) {
                                     ColorUtils.lighten(ColorUtils.lighten(Color.BLACK))
                                 } else {
                                     Color.BLACK
